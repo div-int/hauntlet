@@ -1,0 +1,19 @@
+{
+  "name": "hauntlet",
+  "version": "0.0.0",
+  "description": "Hauntlet arcade game built with Phaser 3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scottmooresoftware/hauntlet.git"
+  },
+  "author": "Scott Moore Software",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scottmooresoftware/hauntlet/issues"
+  },
+  "homepage": "https://github.com/scottmooresoftware/hauntlet#readme"
+}
