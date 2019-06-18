@@ -1,16 +1,6 @@
 import Phaser from "phaser";
+import config from "./config/config.js"
 import logoImg from "./assets/images/logo.png";
-
-const config = {
-  type: Phaser.AUTO,
-  parent: "hauntlet",
-  width: 800,
-  height: 600,
-  scene: {
-    preload: preload,
-    create: create
-  }
-};
 
 const game = new Phaser.Game(config);
 
