@@ -3,7 +3,7 @@ import logoImg from "./assets/images/logo.png";
 
 const config = {
   type: Phaser.AUTO,
-  parent: "phaser-example",
+  parent: "hauntlet",
   width: 800,
   height: 600,
   scene: {
