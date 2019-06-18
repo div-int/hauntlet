@@ -1,6 +1,4 @@
-import Phaser from "phaser";
-
-export const config = {
+export default {
     type: Phaser.AUTO,
     parent: "hauntlet",
     width: 640,
@@ -11,9 +9,12 @@ export const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: {
-      preload: preload,
-      create: create
+    physics: {
+      default: "arcade",
+      arcade: {
+          debug: true,
+          gravity: {x:0, y: 0}
+      }
     }
-  };
+};
   
