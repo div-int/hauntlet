@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-const config = {
+export const config = {
     type: Phaser.AUTO,
     parent: "hauntlet",
     width: 640,
