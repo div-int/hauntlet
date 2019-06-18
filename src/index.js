@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import logoImg from "./assets/logo.png";
+import logoImg from "./assets/images/logo.png";
 
 const config = {
   type: Phaser.AUTO,
