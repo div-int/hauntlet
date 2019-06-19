@@ -1,6 +1,6 @@
-import Phaser from "phaser";
-import config from "./config/config";
-import GameScene from "./scenes/GameScene";
+import Phaser from 'phaser';
+import config from './config/config';
+import GameScene from './scenes/gamescene';
 
 class HauntletGame extends Phaser.Game {
   constructor() {
