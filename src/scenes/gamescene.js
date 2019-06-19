@@ -32,14 +32,23 @@ export default class GameScene extends Phaser.Scene {
         mapLayers[3] = map.createStaticLayer('Items', mapTiles).setScale(4, 4);
 
         logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 1, 'logo').setScale(2, 2).setScrollFactor(0);
-        
+
+        this.tweens.add({
+            targets: logo,
+            scaleX: 1,
+            scaleY: 1,
+            ease: 'Power2',
+            duration: 1000,
+            yoyo: -1,
+            repeat: -1
+        });
+
         this.cameras.main.setBounds(0, 0, map.widthInPixels * 4, map.heightInPixels * 4);
     }
 
     update() {
         position++;
         this.cameras.main.setZoom(cameraScale);
-        logo.angle = (position / 2.0) % 360;
         this.cameras.main.setScroll(position,position);
     }
 }
