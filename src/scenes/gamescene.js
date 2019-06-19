@@ -28,7 +28,7 @@ export default class GameScene extends Phaser.Scene {
         mapLayers[2] = map.createStaticLayer('Walls', mapTiles).setScale(4, 4);
         mapLayers[3] = map.createStaticLayer('Items', mapTiles).setScale(4, 4).setAlpha(0.5);
 
-        // this.add.sprite(320, 256, 'testTiles');
+        this.cameras.main.setBounds(0, 0, map.widthInPixels * 4, map.heightInPixels * 4);
     }
 
     update() {
