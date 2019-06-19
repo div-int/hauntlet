@@ -21,8 +21,6 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
-        this.cameras.main.setZoom(cameraScale);
-
         map = this.add.tilemap('testMap');
         mapTiles = map.addTilesetImage('test', 'testTiles');
         mapLayers[0] = map.createStaticLayer('Floor', mapTiles).setScale(4,4);
@@ -35,6 +33,7 @@ export default class GameScene extends Phaser.Scene {
 
     update() {
         position++;
+        this.cameras.main.setZoom(cameraScale);
         this.cameras.main.setScroll(position,position);
     }
 }
