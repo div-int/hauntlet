@@ -59,12 +59,12 @@
         {
          "columns":8,
          "firstgid":1,
-         "image":"..\/..\/images\/tiles\/test.png",
-         "imageheight":256,
-         "imagewidth":256,
-         "margin":0,
+         "image":"..\/..\/images\/tiles\/test.extruded.png",
+         "imageheight":272,
+         "imagewidth":272,
+         "margin":1,
          "name":"test",
-         "spacing":0,
+         "spacing":2,
          "tilecount":64,
          "tileheight":32,
          "tilewidth":32

@@ -1,12 +1,12 @@
 import Phaser from 'phaser';
 import testJSON from '../assets/maps/tiled/test.json';
-import testTilesPNG from '../assets/images/tiles/test.png';
+import testTilesPNG from '../assets/images/tiles/test.extruded.png';
 
 var map;
 var mapTiles;
 var mapLayers = [];
 var position = 0;
-var cameraScale = 0.5
+var cameraScale = 1;
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
