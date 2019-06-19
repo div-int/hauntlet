@@ -1,8 +1,8 @@
 export default {
     type: Phaser.AUTO,
     parent: "hauntlet",
-    width: 640,
-    height: 512,
+    width: window.innerWidth,
+    height: window.innerHeight,
     pixelArt: true,
     roundPixels: false,
     scale: {
