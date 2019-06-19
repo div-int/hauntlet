@@ -1,4 +1,4 @@
-(https://hauntlet.scottmooresoftware.com) [![Netlify Status](https://api.netlify.com/api/v1/badges/20f7c433-f96a-4013-969b-d6d2dfe31d6d/deploy-status)](https://app.netlify.com/sites/wizardly-spence-113131/deploys)
+[Hauntlet](https://hauntlet.scottmooresoftware.com) [![Netlify Status](https://api.netlify.com/api/v1/badges/20f7c433-f96a-4013-969b-d6d2dfe31d6d/deploy-status)](https://app.netlify.com/sites/wizardly-spence-113131/deploys)
 
 # Phaser 3 Webpack Project Template
 
