@@ -31,7 +31,7 @@ export default class GameScene extends Phaser.Scene {
         mapLayers[2] = map.createStaticLayer('Walls', mapTiles).setScale(4, 4);
         mapLayers[3] = map.createStaticLayer('Items', mapTiles).setScale(4, 4);
 
-        logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 1, 'logo').setScale(4, 4).setScrollFactor(0);
+        logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 1, 'logo').setScale(2, 2).setScrollFactor(0);
         
         this.cameras.main.setBounds(0, 0, map.widthInPixels * 4, map.heightInPixels * 4);
     }
