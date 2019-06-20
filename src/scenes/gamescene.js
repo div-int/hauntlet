@@ -147,7 +147,7 @@ export default class GameScene extends Phaser.Scene {
             ghostSprites[i].anims.play('ghostMoveSouth');
             ghostSprites[i].body.setCollideWorldBounds(true);
             ghostSprites[i].body.setMaxVelocity(50);    
-            ghostsGroup.add(ghostSprites[i], true);
+            ghostsGroup.add(ghostSprites[i], false);
         }
 
         this.physics.add.collider(testSprite, mapLayers[2]);
@@ -155,6 +155,7 @@ export default class GameScene extends Phaser.Scene {
         this.physics.add.collider(testSprite, ghostsGroup, (o1, o2) => {
             console.log('Ghost and player collided');
         }, null, this);
+        this.physics.add.collider(ghostsGroup, ghostsGroup);
 
         cursorKeys = this.input.keyboard.createCursorKeys();
 
@@ -202,6 +203,8 @@ export default class GameScene extends Phaser.Scene {
         }
         
         var moving = false;
+        
+        testSprite.setDepth(100 + testSprite.x + (testSprite.y * map.widthInPixels));
 
         if (cursorKeys.right.isDown || moveRight) {
             testSprite.setAccelerationX(spriteVelocity * 2);
@@ -253,12 +256,15 @@ export default class GameScene extends Phaser.Scene {
         var ghostXDiff, ghostYDiff;
 
         for (var i = 0; i < maxGhosts; i++) {
+            ghostSprites[i].setDepth(100 + ghostSprites[i].x + (ghostSprites[i].y * map.widthInPixels));
             ghostXDiff = ghostSprites[i].x - testSprite.x;
             ghostYDiff = ghostSprites[i].y - testSprite.y;
 
             if (ghostXDiff < 16) {
+                ghostSprites[i].body.useDamping = false;
                 ghostSprites[i].setAccelerationX(Phaser.Math.Between(10, 100));
             } else if (ghostXDiff > 16) {
+                ghostSprites[i].body.useDamping = false;
                 ghostSprites[i].setAccelerationX(-Phaser.Math.Between(10, 100));
             } else {
                 ghostSprites[i].setAccelerationX(0);
@@ -266,8 +272,10 @@ export default class GameScene extends Phaser.Scene {
                 ghostSprites[i].setDrag(0.25);
             }
             if (ghostYDiff < 16) {
+                ghostSprites[i].body.useDamping = false;
                 ghostSprites[i].setAccelerationY(Phaser.Math.Between(10, 100));
             } else if (ghostYDiff > 16) {
+                ghostSprites[i].body.useDamping = false;
                 ghostSprites[i].setAccelerationY(-Phaser.Math.Between(10, 100));
             } else {
                 ghostSprites[i].setAccelerationY(0);
