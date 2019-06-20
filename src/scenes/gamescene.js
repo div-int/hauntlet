@@ -37,9 +37,10 @@ export default class GameScene extends Phaser.Scene {
         
         mapTiles = map.addTilesetImage('test', 'testTiles');
         mapLayers[0] = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
-        mapLayers[1] = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(2);
-        mapLayers[2] = map.createDynamicLayer('Walls', mapTiles).setScale(displayScale, displayScale).setDepth(3);
-        mapLayers[3] = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(4);
+        mapLayers[1] = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(4);
+        mapLayers[2] = map.createDynamicLayer('Walls', mapTiles).setScale(displayScale, displayScale).setDepth(2);
+        mapLayers[3] = map.createStaticLayer('Exits', mapTiles).setScale(displayScale, displayScale).setDepth(3);
+        mapLayers[4] = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(5);
 
         mapLayers[2].setCollisionByExclusion([-1], true, true);
 
