@@ -16,6 +16,33 @@ var testSprite;
 var ghostsGroup, ghostSprites = [], maxGhosts = 100;
 var testSpriteDirection = 'South';
 var cursorKeys;
+var doors = [];
+
+function findDoorAt(x, y) {
+    var foundDoorId;
+
+    //console.log(`findDoorAt(${x}, ${y})`);
+    Object.entries(doors).forEach((door) => {
+        door[1].forEach((location) => {
+            //console.log(location);
+
+            if ((x === location.x) && (y === location.y))
+            {
+                foundDoorId = door[0];
+            }
+        });
+    });
+
+    return foundDoorId;
+}
+
+function removeDoor(doorId) {
+    console.log(`removeDoor(${doorId})`);
+    doors[doorId].forEach((location) => {
+        mapLayers['Doors'].removeTileAt(location.x, location.y, false, true);
+    });
+}
+
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -36,16 +63,28 @@ export default class GameScene extends Phaser.Scene {
         map = this.add.tilemap('testMap');
         
         mapTiles = map.addTilesetImage('test', 'testTiles');
-        mapLayers['Walls'] = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
+        mapLayers['Floor'] = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
         mapLayers['Walls'] = map.createDynamicLayer('Walls', mapTiles).setScale(displayScale, displayScale).setDepth(2);
         mapLayers['Exits'] = map.createStaticLayer('Exits', mapTiles).setScale(displayScale, displayScale).setDepth(3);
         mapLayers['Items'] = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(4);
-        mapLayers['Doors'] = map.createStaticLayer('Doors', mapTiles).setScale(displayScale, displayScale).setDepth(4);
         mapLayers['Shadows'] = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(10000000);
+        mapLayers['Doors'] = map.createBlankDynamicLayer('Doors', mapTiles).setScale(displayScale, displayScale).setDepth(5);
+        
+        const objects = map.findObject('Doors', (o) => {
+            console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
+            mapLayers['Doors'].putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
+            if (typeof doors[o.name] == "undefined") {
+                doors[o.name] = new Array;
+            }
+            doors[o.name].push({
+                'x': o.x >> 5,
+                'y': (o.y >> 5) - 1
+            });
+        });
 
         mapLayers['Walls'].setCollisionByExclusion([-1], true, true);
         mapLayers['Doors'].setCollisionByExclusion([-1], true, true);
-
+        
         logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 2, 'logo').setScale(displayScale, displayScale).setScrollFactor(0).setDepth(20000000);
 
         this.anims.create({
@@ -106,6 +145,7 @@ export default class GameScene extends Phaser.Scene {
         testSprite.anims.play('idleSouth');
         testSprite.body.setCollideWorldBounds(true);
         testSprite.body.setMaxVelocity(spriteVelocity);
+        testSprite.name="Player";
 
         this.anims.create({
             key: 'ghostMoveSouth',
@@ -149,15 +189,19 @@ export default class GameScene extends Phaser.Scene {
             ghostSprites[i].setScale(spriteScale * 2, spriteScale);
             ghostSprites[i].anims.play('ghostMoveSouth');
             ghostSprites[i].body.setCollideWorldBounds(true);
-            ghostSprites[i].body.setMaxVelocity(50);    
+            ghostSprites[i].body.setMaxVelocity(50);
+            ghostSprites[i].name="Ghost";    
             ghostsGroup.add(ghostSprites[i], false);
         }
 
         this.physics.add.collider(testSprite, mapLayers['Walls']);
         this.physics.add.collider(ghostsGroup, mapLayers['Walls']);
         this.physics.add.collider(testSprite, mapLayers['Doors'], (o1, o2) => {
-            console.log('Player hit door');
-        });
+            if (o1.name === 'Player') {
+                removeDoor(findDoorAt(o2.x, o2.y));
+                console.log(o2.index,o2.x,o2.y);
+            }
+        }, null, this);
         this.physics.add.collider(ghostsGroup, mapLayers['Doors']);
         this.physics.add.collider(testSprite, ghostsGroup, (o1, o2) => {
             console.log('Ghost and player collided');
