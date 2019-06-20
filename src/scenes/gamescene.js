@@ -173,14 +173,42 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
+        var pointer = this.input.activePointer;
+        var moveLeft = false;
+        var moveRight = false;
+        var moveUp = false;
+        var moveDown = false;
+        
+        if (pointer.isDown) {
+            var touchX = pointer.x;
+            var touchY = pointer.y;
+            var worldPoint = this.cameras.main.getWorldPoint(touchX, touchY);
+
+            if (worldPoint.x < testSprite.x) {
+                moveLeft = true;
+                moveRight = false;
+            } else if (worldPoint.x > testSprite.x) {
+                moveLeft = false;
+                moveRight = true;
+            }
+
+            if (worldPoint.y < testSprite.y) {
+                moveUp = true;
+                moveDown = false;
+            } else if (worldPoint.y > testSprite.y) {
+                moveUp = false;
+                moveDown = true;
+            }
+        }
+        
         var moving = false;
 
-        if (cursorKeys.right.isDown) {
+        if (cursorKeys.right.isDown || moveRight) {
             testSprite.setAccelerationX(spriteVelocity * 2);
             if ((testSprite.anims.currentAnim.key != 'walkEast') && (moving === false)) { testSprite.anims.play('walkEast'); }
             testSpriteDirection='East';
             moving = true;
-        } else if (cursorKeys.left.isDown) {
+        } else if (cursorKeys.left.isDown || moveLeft) {
             testSprite.setAccelerationX(-spriteVelocity * 2);
             if ((testSprite.anims.currentAnim.key != 'walkWest') && (moving === false)) { testSprite.anims.play('walkWest'); }
             testSpriteDirection='West';
@@ -192,12 +220,12 @@ export default class GameScene extends Phaser.Scene {
             moving = false;
         }
         
-        if (cursorKeys.up.isDown) {
+        if (cursorKeys.up.isDown || moveUp) {
             testSprite.setAccelerationY(-spriteVelocity * 2);
             if ((testSprite.anims.currentAnim.key != 'walkNorth') && (moving === false)) { testSprite.anims.play('walkNorth'); }
             testSpriteDirection='North';
             moving = true;
-        } else if (cursorKeys.down.isDown) {
+        } else if (cursorKeys.down.isDown || moveDown) {
             testSprite.setAccelerationY(spriteVelocity * 2);
             if ((testSprite.anims.currentAnim.key != 'walkSouth') && (moving === false)) { testSprite.anims.play('walkSouth'); }
             testSpriteDirection='South';
@@ -229,18 +257,18 @@ export default class GameScene extends Phaser.Scene {
             ghostYDiff = ghostSprites[i].y - testSprite.y;
 
             if (ghostXDiff < 16) {
-                ghostSprites[i].setAccelerationX(25);
+                ghostSprites[i].setAccelerationX(Phaser.Math.Between(10, 100));
             } else if (ghostXDiff > 16) {
-                ghostSprites[i].setAccelerationX(-25);
+                ghostSprites[i].setAccelerationX(-Phaser.Math.Between(10, 100));
             } else {
                 ghostSprites[i].setAccelerationX(0);
                 ghostSprites[i].body.useDamping = true;
                 ghostSprites[i].setDrag(0.25);
             }
             if (ghostYDiff < 16) {
-                ghostSprites[i].setAccelerationY(25);
+                ghostSprites[i].setAccelerationY(Phaser.Math.Between(10, 100));
             } else if (ghostYDiff > 16) {
-                ghostSprites[i].setAccelerationY(-25);
+                ghostSprites[i].setAccelerationY(-Phaser.Math.Between(10, 100));
             } else {
                 ghostSprites[i].setAccelerationY(0);
                 ghostSprites[i].body.useDamping = true;
