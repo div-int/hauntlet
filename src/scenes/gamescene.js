@@ -36,15 +36,17 @@ export default class GameScene extends Phaser.Scene {
         map = this.add.tilemap('testMap');
         
         mapTiles = map.addTilesetImage('test', 'testTiles');
-        mapLayers[0] = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
-        mapLayers[1] = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(4);
-        mapLayers[2] = map.createDynamicLayer('Walls', mapTiles).setScale(displayScale, displayScale).setDepth(2);
-        mapLayers[3] = map.createStaticLayer('Exits', mapTiles).setScale(displayScale, displayScale).setDepth(3);
-        mapLayers[4] = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(5);
+        mapLayers['Walls'] = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
+        mapLayers['Walls'] = map.createDynamicLayer('Walls', mapTiles).setScale(displayScale, displayScale).setDepth(2);
+        mapLayers['Exits'] = map.createStaticLayer('Exits', mapTiles).setScale(displayScale, displayScale).setDepth(3);
+        mapLayers['Items'] = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(4);
+        mapLayers['Doors'] = map.createStaticLayer('Doors', mapTiles).setScale(displayScale, displayScale).setDepth(4);
+        mapLayers['Shadows'] = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(10000000);
 
-        mapLayers[2].setCollisionByExclusion([-1], true, true);
+        mapLayers['Walls'].setCollisionByExclusion([-1], true, true);
+        mapLayers['Doors'].setCollisionByExclusion([-1], true, true);
 
-        logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 2, 'logo').setScale(displayScale, displayScale).setScrollFactor(0).setDepth(10000);
+        logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 2, 'logo').setScale(displayScale, displayScale).setScrollFactor(0).setDepth(20000000);
 
         this.anims.create({
             key: 'idleNorth',
@@ -151,8 +153,12 @@ export default class GameScene extends Phaser.Scene {
             ghostsGroup.add(ghostSprites[i], false);
         }
 
-        this.physics.add.collider(testSprite, mapLayers[2]);
-        this.physics.add.collider(ghostsGroup, mapLayers[2]);
+        this.physics.add.collider(testSprite, mapLayers['Walls']);
+        this.physics.add.collider(ghostsGroup, mapLayers['Walls']);
+        this.physics.add.collider(testSprite, mapLayers['Doors'], (o1, o2) => {
+            console.log('Player hit door');
+        });
+        this.physics.add.collider(ghostsGroup, mapLayers['Doors']);
         this.physics.add.collider(testSprite, ghostsGroup, (o1, o2) => {
             console.log('Ghost and player collided');
         }, null, this);
