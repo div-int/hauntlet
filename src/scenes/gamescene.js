@@ -13,7 +13,7 @@ var spriteScale = 2;
 var spriteVelocity = 150;
 var logo;
 var testSprite;
-var ghostsGroup, ghostSprites = [];
+var ghostsGroup, ghostSprites = [], maxGhosts = 100;
 var testSpriteDirection = 'South';
 var cursorKeys;
 
@@ -139,8 +139,8 @@ export default class GameScene extends Phaser.Scene {
             bounceY: 1
         });
 
-        for (var i = 0; i < 500; i++) {
-            ghostSprites[i] = this.physics.add.sprite(Phaser.Math.Between(32, 64) * 32, Phaser.Math.Between(32, 64) * 32, 'ghostSprite', 0).setAlpha(0.5).setScrollFactor(1, 1).setDepth(5);
+        for (var i = 0; i < maxGhosts; i++) {
+            ghostSprites[i] = this.physics.add.sprite(Phaser.Math.Between(32, 64) * 32, Phaser.Math.Between(32, 64) * 32, 'ghostSprite', 0).setAlpha(0.7).setScrollFactor(1, 1).setDepth(5);
             ghostSprites[i].body.setSize(10, 32);
             ghostSprites[i].body.setOffset(14, 32);
             ghostSprites[i].setScale(spriteScale * 2, spriteScale);
@@ -152,9 +152,6 @@ export default class GameScene extends Phaser.Scene {
 
         this.physics.add.collider(testSprite, mapLayers[2]);
         this.physics.add.collider(ghostsGroup, mapLayers[2]);
-        this.physics.add.collider(ghostsGroup, ghostsGroup, (o1, o2) => {
-            //o2.body.enable = false;
-        });
         this.physics.add.collider(testSprite, ghostsGroup, (o1, o2) => {
             console.log('Ghost and player collided');
         }, null, this);
@@ -227,7 +224,7 @@ export default class GameScene extends Phaser.Scene {
 
         var ghostXDiff, ghostYDiff;
 
-        for (var i = 0; i < 500; i++) {
+        for (var i = 0; i < maxGhosts; i++) {
             ghostXDiff = ghostSprites[i].x - testSprite.x;
             ghostYDiff = ghostSprites[i].y - testSprite.y;
 
@@ -248,6 +245,20 @@ export default class GameScene extends Phaser.Scene {
                 ghostSprites[i].setAccelerationY(0);
                 ghostSprites[i].body.useDamping = true;
                 ghostSprites[i].setDrag(0.25);
+            }
+
+            if (Math.abs(ghostXDiff) > Math.abs(ghostYDiff)) {
+                if (ghostXDiff < 0) {
+                    if (ghostSprites[i].anims.currentAnim.key != 'ghostMoveEast') { ghostSprites[i].anims.play('ghostMoveEast'); }
+                } else {
+                    if (ghostSprites[i].anims.currentAnim.key != 'ghostMoveWest') { ghostSprites[i].anims.play('ghostMoveWest'); }
+                }
+            } else {
+                if (ghostYDiff < 0) {
+                    if (ghostSprites[i].anims.currentAnim.key != 'ghostMoveSouth') { ghostSprites[i].anims.play('ghostMoveSouth'); }
+                } else {
+                    if (ghostSprites[i].anims.currentAnim.key != 'ghostMoveNorth') { ghostSprites[i].anims.play('ghostMoveNorth'); }
+                }
             }
         }
     }
