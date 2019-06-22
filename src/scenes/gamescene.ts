@@ -1,9 +1,10 @@
-import "phaser";
-// import testJSON from '../assets/maps/tiled/test.json';
-// import testTilesPNG from '../assets/images/tiles/test.extruded.png';
-// import testSpritePNG from '../assets/images/characters/test.png';
-// import ghostSpritePNG from '../assets/images/characters/ghost.png';
-// import logoPNG from '../assets/images/logo.png';
+import 'phaser';
+
+var testJSON = require('../assets/maps/tiled/test.json');
+var testTilesPNG = require('../assets/images/tiles/test.extruded.png');
+var testSpritePNG = require('../assets/images/characters/test.png');
+var ghostSpritePNG = require('../assets/images/characters/ghost.png');
+var logoPNG = require('../assets/images/logo.png');
 
 const MAX_GHOSTS:integer = 100;
 
@@ -57,13 +58,13 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.tilemapTiledJSON('testMap', '../assets/maps/tiled/test.json');
+        this.load.tilemapTiledJSON('testMap', testJSON);
 
-        this.load.image('testTiles', '../assets/images/tiles/test.extruded.png');
-        this.load.image('logo', '../assets/images/logo.png');
+        this.load.image('testTiles', testTilesPNG);
+        this.load.image('logo', logoPNG);
 
-        this.load.spritesheet('testSprite', '../assets/images/characters/test.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('ghostSprite', '../assets/images/characters/ghost.png', { frameWidth: 32, frameHeight: 64 })
+        this.load.spritesheet('testSprite', testSpritePNG, { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('ghostSprite', ghostSpritePNG, { frameWidth: 32, frameHeight: 64 })
     }
 
     create() {
