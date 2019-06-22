@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
+      "outDir": "./dist/",
       "target": "ES2016",
       "module": "CommonJS",
       "sourceMap": true,
+      "allowJs": true,
       "noImplicitAny": false,
       "strict": false
     }

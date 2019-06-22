@@ -6,6 +6,10 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 module.exports = {
   mode: "development",
   entry: './src/index.ts',
+  devtool: 'inline-source-map',
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: 'bundle.js',
@@ -28,8 +32,8 @@ module.exports = {
     ]
   },
   devServer: {
-    contentBase: path.resolve(__dirname, '../'),
-    publicPath: '/dist/',
+    contentBase: path.resolve(__dirname, '../src/'),
+    publicPath: '/',
     host: 'localhost',
     port: 8080,
     open: true

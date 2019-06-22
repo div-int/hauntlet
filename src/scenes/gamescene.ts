@@ -5,25 +5,25 @@ import "Phaser";
 // import ghostSpritePNG from '../assets/images/characters/ghost.png';
 // import logoPNG from '../assets/images/logo.png';
 
-var map: Phaser.Tilemaps.Tilemap;
-var mapTiles: Phaser.Tilemaps.Tileset;
-// var mapLayers [];
-var mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
-var mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
+const MAX_GHOSTS:integer = 100;
+
+var map:Phaser.Tilemaps.Tilemap;
+var mapTiles:Phaser.Tilemaps.Tileset;
+var mapLayerFloor:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerWalls:Phaser.Tilemaps.DynamicTilemapLayer;
+var mapLayerExits:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerItems:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerShadows:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerDoors:Phaser.Tilemaps.DynamicTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
 var spriteVelocity = 150;
-var logo: Phaser.GameObjects.Sprite;
-var testSprite: Phaser.Physics.Arcade.Sprite;
+var logo:Phaser.GameObjects.Sprite;
+var testSprite:Phaser.Physics.Arcade.Sprite;
 var ghostsGroup;
-var ghostSprites: Phaser.Physics.Arcade.Sprite[];
-var maxGhosts = 100;
+var ghostSprites:Phaser.Physics.Arcade.Sprite[] = new Array;
 var testSpriteDirection = 'South';
-var cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+var cursorKeys:Phaser.Types.Input.Keyboard.CursorKeys;
 // var doors = [];
 
 // function findDoorAt(x, y) {
@@ -189,7 +189,7 @@ export default class GameScene extends Phaser.Scene {
             bounceY: 1
         });
 
-        for (var i = 0; i < maxGhosts; i++) {
+        for (var i = 0; i < MAX_GHOSTS; i++) {
             ghostSprites[i] = this.physics.add.sprite(Phaser.Math.Between(32, 64) * 32, Phaser.Math.Between(32, 64) * 32, 'ghostSprite', 0).setAlpha(0.7).setScrollFactor(1, 1).setDepth(5);
             ghostSprites[i].setSize(10, 32);
             ghostSprites[i].setOffset(14, 32);
@@ -313,7 +313,7 @@ export default class GameScene extends Phaser.Scene {
 
         var ghostXDiff, ghostYDiff;
 
-        for (var i = 0; i < maxGhosts; i++) {
+        for (var i = 0; i < MAX_GHOSTS; i++) {
             ghostSprites[i].setDepth(100 + ghostSprites[i].x + (ghostSprites[i].y * map.widthInPixels));
             ghostXDiff = ghostSprites[i].x - testSprite.x;
             ghostYDiff = ghostSprites[i].y - testSprite.y;
