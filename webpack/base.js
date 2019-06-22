@@ -5,25 +5,38 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  devtool: "eval-source-map",
+  entry: './src/index.ts',
+  devtool: 'inline-source-map',
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ]
+  },
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: 'bundle.js',
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
+        test: /\.ts$/, 
+        loader: 'ts-loader',
+        exclude: '/node_modules/'
       },
       {
-        test: [/\.vert$/, /\.frag$/],
-        use: "raw-loader"
+        test: /\.js$/,
+        loader: 'babel-loader'
       },
       {
         test: /\.(gif|png|jpe?g|svg|xml)$/i,
         use: "file-loader"
       }
     ]
+  },
+  devServer: {
+    contentBase: path.resolve(__dirname, '../src/'),
+    publicPath: '/',
+    host: 'localhost',
+    port: 8080,
+    open: true
   },
   plugins: [
     new CleanWebpackPlugin(["dist"], {

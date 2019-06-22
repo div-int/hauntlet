@@ -1,9 +1,9 @@
-import Phaser from 'phaser';
+import 'phaser';
 import config from './config/config';
 import GameScene from './scenes/gamescene';
 
 class HauntletGame extends Phaser.Game {
-  constructor() {
+  constructor(config: Phaser.Types.Core.GameConfig) {
     super(config);
 
     console.log('HauntletGame::constructor()');
@@ -14,5 +14,7 @@ class HauntletGame extends Phaser.Game {
 }
 
 window.onload = function () {
-  window.game = new HauntletGame();
+  //window.game = new HauntletGame();
+
+  var game = new HauntletGame(config);
 }

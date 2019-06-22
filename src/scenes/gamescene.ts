@@ -1,48 +1,56 @@
-import Phaser from 'phaser';
-import testJSON from '../assets/maps/tiled/test.json';
-import testTilesPNG from '../assets/images/tiles/test.extruded.png';
-import testSpritePNG from '../assets/images/characters/test.png';
-import ghostSpritePNG from '../assets/images/characters/ghost.png';
-import logoPNG from '../assets/images/logo.png';
+import 'phaser';
 
-var map;
-var mapTiles;
-var mapLayers = [];
+var testJSON = require('../assets/maps/tiled/test.json');
+var testTilesPNG = require('../assets/images/tiles/test.extruded.png');
+var testSpritePNG = require('../assets/images/characters/test.png');
+var ghostSpritePNG = require('../assets/images/characters/ghost.png');
+var logoPNG = require('../assets/images/logo.png');
+
+const MAX_GHOSTS:integer = 100;
+
+var map:Phaser.Tilemaps.Tilemap;
+var mapTiles:Phaser.Tilemaps.Tileset;
+var mapLayerFloor:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerWalls:Phaser.Tilemaps.DynamicTilemapLayer;
+var mapLayerExits:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerItems:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerShadows:Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerDoors:Phaser.Tilemaps.DynamicTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
 var spriteVelocity = 150;
-var logo;
-var testSprite;
-var ghostsGroup, ghostSprites = [], maxGhosts = 100;
+var logo:Phaser.GameObjects.Sprite;
+var testSprite:Phaser.Physics.Arcade.Sprite;
+var ghostsGroup;
+var ghostSprites:Phaser.Physics.Arcade.Sprite[] = new Array;
 var testSpriteDirection = 'South';
-var cursorKeys;
-var doors = [];
+var cursorKeys:Phaser.Types.Input.Keyboard.CursorKeys;
+// var doors = [];
 
-function findDoorAt(x, y) {
-    var foundDoorId;
+// function findDoorAt(x, y) {
+//     var foundDoorId;
 
-    //console.log(`findDoorAt(${x}, ${y})`);
-    Object.entries(doors).forEach((door) => {
-        door[1].forEach((location) => {
-            //console.log(location);
+//     //console.log(`findDoorAt(${x}, ${y})`);
+//     Object.entries(doors).forEach((door) => {
+//         door[1].forEach((location) => {
+//             //console.log(location);
 
-            if ((x === location.x) && (y === location.y))
-            {
-                foundDoorId = door[0];
-            }
-        });
-    });
+//             if ((x === location.x) && (y === location.y))
+//             {
+//                 foundDoorId = door[0];
+//             }
+//         });
+//     });
 
-    return foundDoorId;
-}
+//     return foundDoorId;
+// }
 
-function removeDoor(doorId) {
-    console.log(`removeDoor(${doorId})`);
-    doors[doorId].forEach((location) => {
-        mapLayers['Doors'].removeTileAt(location.x, location.y, false, true);
-    });
-}
-
+// function removeDoor(doorId) {
+//     console.log(`removeDoor(${doorId})`);
+//     doors[doorId].forEach((location) => {
+//         mapLayerDoors.removeTileAt(location.x, location.y, false, true);
+//     });
+// }
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -63,27 +71,27 @@ export default class GameScene extends Phaser.Scene {
         map = this.add.tilemap('testMap');
         
         mapTiles = map.addTilesetImage('test', 'testTiles');
-        mapLayers['Floor'] = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
-        mapLayers['Walls'] = map.createDynamicLayer('Walls', mapTiles).setScale(displayScale, displayScale).setDepth(2);
-        mapLayers['Exits'] = map.createStaticLayer('Exits', mapTiles).setScale(displayScale, displayScale).setDepth(3);
-        mapLayers['Items'] = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(4);
-        mapLayers['Shadows'] = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(10000000);
-        mapLayers['Doors'] = map.createBlankDynamicLayer('Doors', mapTiles).setScale(displayScale, displayScale).setDepth(5);
+        mapLayerFloor = map.createStaticLayer('Floor', mapTiles).setScale(displayScale, displayScale).setDepth(1);
+        mapLayerWalls = map.createDynamicLayer('Walls', mapTiles, 0, 0).setScale(displayScale, displayScale).setDepth(2);
+        mapLayerExits = map.createStaticLayer('Exits', mapTiles).setScale(displayScale, displayScale).setDepth(3);
+        mapLayerItems = map.createStaticLayer('Items', mapTiles).setScale(displayScale, displayScale).setDepth(4);
+        mapLayerShadows = map.createStaticLayer('Shadows', mapTiles).setScale(displayScale, displayScale).setDepth(10000000);
+        mapLayerDoors = map.createBlankDynamicLayer('Doors', mapTiles).setScale(displayScale, displayScale).setDepth(5);
         
-        const objects = map.findObject('Doors', (o) => {
-            console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
-            mapLayers['Doors'].putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
-            if (typeof doors[o.name] == "undefined") {
-                doors[o.name] = new Array;
-            }
-            doors[o.name].push({
-                'x': o.x >> 5,
-                'y': (o.y >> 5) - 1
-            });
-        });
+        // const objects = map.findObject('Doors', (o) => {
+        //     console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
+        //     mapLayerDoors.putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
+        //     if (typeof doors[o.name] == "undefined") {
+        //         doors[o.name] = new Array;
+        //     }
+        //     doors[o.name].push({
+        //         'x': o.x >> 5,
+        //         'y': (o.y >> 5) - 1
+        //     });
+        // });
 
-        mapLayers['Walls'].setCollisionByExclusion([-1], true, true);
-        mapLayers['Doors'].setCollisionByExclusion([-1], true, true);
+        mapLayerWalls.setCollisionByExclusion([-1], true, true);
+        mapLayerDoors.setCollisionByExclusion([-1], true, true);
         
         logo = this.add.sprite(window.innerWidth >> 1, window.innerHeight >> 2, 'logo').setScale(displayScale, displayScale).setScrollFactor(0).setDepth(20000000);
 
@@ -139,12 +147,12 @@ export default class GameScene extends Phaser.Scene {
         this.physics.world.setBounds(0, 0, map.widthInPixels * displayScale, map.heightInPixels * displayScale);
 
         testSprite = this.physics.add.sprite(320, 320, 'testSprite', 2).setScrollFactor(1, 1).setDepth(5);        
-        testSprite.body.setSize(20, 32);
-        testSprite.body.setOffset(28, 32);
+        testSprite.setSize(20, 32);
+        testSprite.setOffset(28, 32);
         testSprite.setScale(spriteScale, spriteScale);
         testSprite.anims.play('idleSouth');
-        testSprite.body.setCollideWorldBounds(true);
-        testSprite.body.setMaxVelocity(spriteVelocity);
+        testSprite.setCollideWorldBounds(true);
+        testSprite.setMaxVelocity(spriteVelocity);
         testSprite.name="Player";
 
         this.anims.create({
@@ -182,27 +190,27 @@ export default class GameScene extends Phaser.Scene {
             bounceY: 1
         });
 
-        for (var i = 0; i < maxGhosts; i++) {
+        for (var i = 0; i < MAX_GHOSTS; i++) {
             ghostSprites[i] = this.physics.add.sprite(Phaser.Math.Between(32, 64) * 32, Phaser.Math.Between(32, 64) * 32, 'ghostSprite', 0).setAlpha(0.7).setScrollFactor(1, 1).setDepth(5);
-            ghostSprites[i].body.setSize(10, 32);
-            ghostSprites[i].body.setOffset(14, 32);
+            ghostSprites[i].setSize(10, 32);
+            ghostSprites[i].setOffset(14, 32);
             ghostSprites[i].setScale(spriteScale * 2, spriteScale);
             ghostSprites[i].anims.play('ghostMoveSouth');
-            ghostSprites[i].body.setCollideWorldBounds(true);
-            ghostSprites[i].body.setMaxVelocity(50);
+            ghostSprites[i].setCollideWorldBounds(true);
+            ghostSprites[i].setMaxVelocity(50);
             ghostSprites[i].name="Ghost";    
             ghostsGroup.add(ghostSprites[i], false);
         }
 
-        this.physics.add.collider(testSprite, mapLayers['Walls']);
-        this.physics.add.collider(ghostsGroup, mapLayers['Walls']);
-        this.physics.add.collider(testSprite, mapLayers['Doors'], (o1, o2) => {
-            if (o1.name === 'Player') {
-                removeDoor(findDoorAt(o2.x, o2.y));
-                console.log(o2.index,o2.x,o2.y);
-            }
+        this.physics.add.collider(testSprite, mapLayerWalls);
+        this.physics.add.collider(ghostsGroup, mapLayerWalls);
+        this.physics.add.collider(testSprite, mapLayerDoors, (o1, o2) => {
+            // if (o1.name === 'Player') {
+            //     removeDoor(findDoorAt(o2.x, o2.y));
+            //     console.log(o2.index,o2.x,o2.y);
+            // }
         }, null, this);
-        this.physics.add.collider(ghostsGroup, mapLayers['Doors']);
+        this.physics.add.collider(ghostsGroup, mapLayerDoors);
         this.physics.add.collider(testSprite, ghostsGroup, (o1, o2) => {
             console.log('Ghost and player collided');
         }, null, this);
@@ -269,7 +277,7 @@ export default class GameScene extends Phaser.Scene {
             moving = true;
         } else {
             testSprite.setAccelerationX(0);
-            testSprite.body.useDamping = true;
+            testSprite.setDamping(true);
             testSprite.setDrag(0.75);
             moving = false;
         }
@@ -286,7 +294,7 @@ export default class GameScene extends Phaser.Scene {
             moving = true;
         } else {
             testSprite.setAccelerationY(0);
-            testSprite.body.useDamping = true;
+            testSprite.setDamping(true);
             testSprite.setDrag(0.75);
             testSprite.anims.msPerFrame = 300;
         }
@@ -306,31 +314,31 @@ export default class GameScene extends Phaser.Scene {
 
         var ghostXDiff, ghostYDiff;
 
-        for (var i = 0; i < maxGhosts; i++) {
+        for (var i = 0; i < MAX_GHOSTS; i++) {
             ghostSprites[i].setDepth(100 + ghostSprites[i].x + (ghostSprites[i].y * map.widthInPixels));
             ghostXDiff = ghostSprites[i].x - testSprite.x;
             ghostYDiff = ghostSprites[i].y - testSprite.y;
 
             if (ghostXDiff < 16) {
-                ghostSprites[i].body.useDamping = false;
+                ghostSprites[i].setDamping(false);
                 ghostSprites[i].setAccelerationX(Phaser.Math.Between(10, 100));
             } else if (ghostXDiff > 16) {
-                ghostSprites[i].body.useDamping = false;
+                ghostSprites[i].setDamping(false);
                 ghostSprites[i].setAccelerationX(-Phaser.Math.Between(10, 100));
             } else {
                 ghostSprites[i].setAccelerationX(0);
-                ghostSprites[i].body.useDamping = true;
+                ghostSprites[i].setDamping(true);
                 ghostSprites[i].setDrag(0.25);
             }
             if (ghostYDiff < 16) {
-                ghostSprites[i].body.useDamping = false;
+                ghostSprites[i].setDamping(false);
                 ghostSprites[i].setAccelerationY(Phaser.Math.Between(10, 100));
             } else if (ghostYDiff > 16) {
-                ghostSprites[i].body.useDamping = false;
+                ghostSprites[i].setDamping(false);
                 ghostSprites[i].setAccelerationY(-Phaser.Math.Between(10, 100));
             } else {
                 ghostSprites[i].setAccelerationY(0);
-                ghostSprites[i].body.useDamping = true;
+                ghostSprites[i].setDamping(true);
                 ghostSprites[i].setDrag(0.25);
             }
 
