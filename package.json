@@ -4,7 +4,7 @@
   "description": "A Phaser 3 Project Template",
   "main": "src/index.js",
   "scripts": {
-    "build": "git fetch --tags && webpack --config webpack/prod.js ",
+    "build": "git pull --tags && webpack --config webpack/prod.js ",
     "start": "webpack-dev-server --config webpack/base.js --open"
   },
   "repository": {
