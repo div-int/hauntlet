@@ -1,4 +1,4 @@
-import "Phaser";
+import "phaser";
 // import testJSON from '../assets/maps/tiled/test.json';
 // import testTilesPNG from '../assets/images/tiles/test.extruded.png';
 // import testSpritePNG from '../assets/images/characters/test.png';
