@@ -9,11 +9,14 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.ts?$/,
+        loader: "babel-loader"
+      },
+      {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
+        use: ["source-map-loader"],
+        enforce: "pre"
       },
       {
         test: [/\.vert$/, /\.frag$/],
