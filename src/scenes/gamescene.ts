@@ -24,6 +24,7 @@ var testSprite:Phaser.Physics.Arcade.Sprite;
 var ghostsGroup;
 var ghostSprites:Phaser.Physics.Arcade.Sprite[] = new Array;
 var testSpriteDirection = 'South';
+var testSpritetakingDamage:Boolean = false;
 var cursorKeys:Phaser.Types.Input.Keyboard.CursorKeys;
 // var doors = [];
 
@@ -191,14 +192,17 @@ export default class GameScene extends Phaser.Scene {
         });
 
         for (var i = 0; i < MAX_GHOSTS; i++) {
-            ghostSprites[i] = this.physics.add.sprite(Phaser.Math.Between(32, 64) * 32, Phaser.Math.Between(32, 64) * 32, 'ghostSprite', 0).setAlpha(0.7).setScrollFactor(1, 1).setDepth(5);
-            ghostSprites[i].setSize(10, 32);
-            ghostSprites[i].setOffset(14, 32);
-            ghostSprites[i].setScale(spriteScale * 2, spriteScale);
+            ghostSprites[i] = this.physics.add.sprite(Phaser.Math.Between(32, 64) * 32, Phaser.Math.Between(32, 64) * 32, 'ghostSprite', 0)
+            .setAlpha(0.7)
+            .setScrollFactor(1, 1)
+            .setDepth(5)
+            .setSize(10, 32)
+            .setOffset(14, 32)
+            .setScale(spriteScale * 2, spriteScale)
+            .setMaxVelocity(50);
+            ghostSprites[i].name="Ghost";
             ghostSprites[i].anims.play('ghostMoveSouth');
             ghostSprites[i].setCollideWorldBounds(true);
-            ghostSprites[i].setMaxVelocity(50);
-            ghostSprites[i].name="Ghost";    
             ghostsGroup.add(ghostSprites[i], false);
         }
 
@@ -211,8 +215,18 @@ export default class GameScene extends Phaser.Scene {
             // }
         }, null, this);
         this.physics.add.collider(ghostsGroup, mapLayerDoors);
-        this.physics.add.collider(testSprite, ghostsGroup, (o1, o2) => {
-            console.log('Ghost and player collided');
+        this.physics.add.collider(testSprite, ghostsGroup, (o1:Phaser.Physics.Arcade.Sprite, o2:Phaser.Physics.Arcade.Sprite) => {
+            if (testSpritetakingDamage === false) {
+                testSpritetakingDamage = true;
+                this.time.delayedCall(50, () => {
+                    testSprite.tint = 0xff0000;
+                    this.time.delayedCall(50, () => {
+                        testSpritetakingDamage = false;
+                        testSprite.tint = 0xffffff;
+                    }, null, this);
+                }, null, this);
+                console.log('Ghost and player collided');
+            }
         }, null, this);
         this.physics.add.collider(ghostsGroup, ghostsGroup);
 
