@@ -60,10 +60,8 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     this.load.tilemapTiledJSON("testMap", testJSON);
-
     this.load.image("testTiles", testTilesPNG);
     this.load.image("logo", logoPNG);
-
     this.load.spritesheet("testSprite", testSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
@@ -76,7 +74,6 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     map = this.add.tilemap("testMap");
-
     mapTiles = map.addTilesetImage("test", "testTiles");
     mapLayerFloor = map
       .createStaticLayer("Floor", mapTiles)
