@@ -87,18 +87,18 @@ export default class GameScene extends Phaser.Scene {
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(3);
+      mapLayerShadows = map
+      .createStaticLayer("Shadows", mapTiles)
+      .setScale(displayScale, displayScale)
+      .setDepth(4);
     mapLayerItems = map
       .createStaticLayer("Items", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(4);
-    mapLayerShadows = map
-      .createStaticLayer("Shadows", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(10000000);
+      .setDepth(5);
     mapLayerDoors = map
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(5);
+      .setDepth(6);
 
     // const objects = map.findObject('Doors', (o) => {
     //     console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
