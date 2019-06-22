@@ -1,4 +1,5 @@
 import "phaser";
+import { Version } from "../version";
 
 var testJSON = require("../assets/maps/tiled/test.json");
 var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
@@ -56,6 +57,8 @@ var cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
+
+    console.log(`GameScene::constructor() : ${Version}`);
   }
 
   preload() {
@@ -73,6 +76,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.add.text(4, 4, `Version : ${Version}`, { fontSize: '16px', fill: '#000' }).setDepth(20000000);
+    this.add.text(3, 3, `Version : ${Version}`, { fontSize: '16px', fill: '#fff' }).setDepth(20000001);
     map = this.add.tilemap("testMap");
     mapTiles = map.addTilesetImage("test", "testTiles");
     mapLayerFloor = map
@@ -87,7 +92,7 @@ export default class GameScene extends Phaser.Scene {
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(3);
-      mapLayerShadows = map
+    mapLayerShadows = map
       .createStaticLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(4);

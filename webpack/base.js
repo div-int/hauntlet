@@ -2,6 +2,10 @@ const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
+const GitRevisionPlugin = require("git-revision-webpack-plugin");
+const gitRevisionPlugin = new GitRevisionPlugin({
+  lightweightTags: true
+})
 
 module.exports = {
   mode: "development",
@@ -48,6 +52,12 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: "./index.html"
+    }),
+    gitRevisionPlugin,
+    new webpack.DefinePlugin({
+      'VERSION': JSON.stringify(gitRevisionPlugin.version()),
+      'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
+      'BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
     })
   ]
 };
