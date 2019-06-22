@@ -1,12 +1,12 @@
 ## [Hauntlet](https://hauntlet.divint.co.uk)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/20f7c433-f96a-4013-969b-d6d2dfe31d6d/deploy-status)](https://app.netlify.com/sites/wizardly-spence-113131/deploys)
 
-# Phaser 3 Webpack Project Template
+# Hauntlet retro arcade game
 
-A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
+A Phaser 3 game built upon a project template with Typescript support, ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
 that includes hot-reloading for development and production-ready builds.
 
-Loading images via JavaScript module `import` is also supported.
+Loading assets via JavaScript module `import` and Typescript module `require` is also supported.
 
 ## Requirements
 
@@ -33,7 +33,7 @@ by default).
 ## Customizing Template
 
 ### Babel
-You can write modern ES6+ JavaScript and Babel will transpile it to a version of JavaScript that you
+You can write modern Typescript, ES6+ JavaScript and Babel will transpile it to a version of JavaScript that you
 want your project to support. The targeted browsers are set in the `.babelrc` file and the default currently
 targets all browsers with total usage over "0.25%" but excludes IE11 and Opera Mini.
 
