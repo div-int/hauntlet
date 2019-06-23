@@ -1,10 +1,10 @@
 {
   "name": "phaser3-project-template",
-  "version": "1.1.0",
-  "description": "A Phaser 3 Project Template",
+  "version": "1.0.0",
+  "description": "A Phaser 3 Typesciprt Project Template",
   "main": "src/index.js",
   "scripts": {
-    "build": "git pull --tags && webpack --config webpack/prod.js ",
+    "build": "git fetch --tags && webpack --config webpack/prod.js ",
     "start": "webpack-dev-server --config webpack/base.js --open"
   },
   "repository": {
