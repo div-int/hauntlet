@@ -76,8 +76,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.text(4, 4, `Version : ${Version}`, { fontSize: '16px', fill: '#000' }).setDepth(20000000);
-    this.add.text(3, 3, `Version : ${Version}`, { fontSize: '16px', fill: '#fff' }).setDepth(20000001);
+    this.add.text(4, 4, `Version : ${Version}`, { fontSize: '16px', fill: '#000' })
+    .setDepth(20000000)
+    .setScrollFactor(0, 0);
+    this.add.text(3, 3, `Version : ${Version}`, { fontSize: '16px', fill: '#fff' })
+    .setDepth(20000001)
+    .setScrollFactor(0, 0);
+    
     map = this.add.tilemap("testMap");
     mapTiles = map.addTilesetImage("test", "testTiles");
     mapLayerFloor = map
