@@ -8,7 +8,15 @@ var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
 var logoPNG = require("../assets/images/logo.png");
 
-let players = new Players();
+Players.MaxPlayers = 2;
+
+let player1: Player = Players.CreatePlayer();
+let player2: Player = Players.CreatePlayer();
+let player3: Player = Players.CreatePlayer();
+let player4: Player = Players.CreatePlayer();
+let player5: Player = Players.CreatePlayer();
+
+console.log(Players.Players);
 
 const MAX_GHOSTS: integer = 100;
 
