@@ -1,3 +1,5 @@
+export interface PlayerIsDeadCallback { (player: Player) : boolean};
+
 export abstract class Players {
   private static _maxPlayers: number = 0;
   private static _playerIndex: number = 0;
@@ -21,11 +23,11 @@ export abstract class Players {
     return Players._players.slice(0, Players._playerIndex);
   }
 
-  public static CreatePlayer(name?: string, startHealth?: number): Player {
+  public static CreatePlayer(name?: string, startHealth?: number, playerIsDeadCallback?: PlayerIsDeadCallback): Player {
     let player: Player;
 
     if (Players._playerIndex < Players._maxPlayers) {
-      player = new Player(Players._playerIndex, name, startHealth);
+      player = new Player(Players._playerIndex, name, startHealth, playerIsDeadCallback);
       Players._players[Players._playerIndex++] = player;
     } else {
       player = null;
@@ -42,19 +44,30 @@ export class Player {
   private _score: number;
   private _health: number;
 
-  public constructor(no: number, name: string, startHealth?: number) {
+  private _isDead: boolean;
+  private _playerIsDeadCallback: PlayerIsDeadCallback;
+
+  public constructor(no: number, name: string, startHealth?: number, playerIsDeadCallback?: PlayerIsDeadCallback) {
     this._no = no ? no : 0;
-    this._name = name ? name : "Player";
-    this._score = 0;
-    this._health = startHealth ? ((startHealth > 0) ? startHealth : 0) : 0;
+    //this._name = name ? name : "Player";
+    this.Name = name;
+    //this._score = 0;
+    this.Score = 0;
+    //this._health = startHealth ? ((startHealth > 0) ? startHealth : 0) : 0;
+    this.Health = startHealth;
+    this._playerIsDeadCallback = playerIsDeadCallback ? playerIsDeadCallback : null;
   }
 
-  public get PlayerNo() {
+  public get No() {
     return this._no;
   }
 
-  public get PlayerName() {
+  public get Name() {
     return this._name;
+  }
+
+  public set Name(name: string) {
+    this._name = name ? name : 'Default Player'
   }
 
   public get Score() {
@@ -62,7 +75,7 @@ export class Player {
   }
 
   public set Score(score: number) {
-    this._score = score;
+    this._score = score >= 0 ? score : 0;
   }
 
   public get Health() {
@@ -70,6 +83,15 @@ export class Player {
   }
 
   public set Health(health: number) {
-    this._health = health;
+    this._health = health ? ((health > 0) ? health : 0) : 0;
+
+    if (this._health > 0) {
+      this._isDead = false;
+    } else {
+      this._isDead = true;
+      if (this._playerIsDeadCallback) {
+        console.log(`Calling player is dead callback : ${this._playerIsDeadCallback(this)}`);
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 import "phaser";
 import { Version } from "../version";
-import { Players } from "../players";
+import { Players, Player } from "../players";
 
 var testJSON = require("../assets/maps/tiled/test.json");
 var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
@@ -10,15 +10,23 @@ var logoPNG = require("../assets/images/logo.png");
 
 Players.MaxPlayers = 8;
 
-Players.CreatePlayer("Player One", 500);
+function playerIsDead(player: Player) : boolean
+{
+  console.log(`${player.Name} is dead!`);
+
+  return true;
+}
+
+Players.CreatePlayer("Player One", 500, playerIsDead);
 Players.CreatePlayer();
-Players.CreatePlayer("Player Three", 400);
-Players.CreatePlayer("Player Four", -100);
-Players.CreatePlayer("Player Five", 300);
+Players.CreatePlayer("Player Three", 400, playerIsDead);
+Players.CreatePlayer("Player Four", -100, playerIsDead);
+Players.CreatePlayer("Player Five", 300, playerIsDead);
 
 for (let player of Players.Players) {
+  player.Health -= 400;
   console.log(
-    `Player ${player.PlayerNo} is called ${player.PlayerName} has a score of ${
+    `Player ${player.No} is called ${player.Name} has a score of ${
       player.Score
     } and their health is ${player.Health}`
   );
