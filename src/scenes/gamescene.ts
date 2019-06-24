@@ -1,6 +1,6 @@
 import "phaser";
 import { Version } from "../version";
-import { Players, Player } from '../players'
+import { Players } from "../players";
 
 var testJSON = require("../assets/maps/tiled/test.json");
 var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
@@ -8,15 +8,21 @@ var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
 var logoPNG = require("../assets/images/logo.png");
 
-Players.MaxPlayers = 2;
+Players.MaxPlayers = 8;
 
-let player1: Player = Players.CreatePlayer();
-let player2: Player = Players.CreatePlayer();
-let player3: Player = Players.CreatePlayer();
-let player4: Player = Players.CreatePlayer();
-let player5: Player = Players.CreatePlayer();
+Players.CreatePlayer("Player One", 500);
+Players.CreatePlayer();
+Players.CreatePlayer("Player Three", 400);
+Players.CreatePlayer("Player Four", -100);
+Players.CreatePlayer("Player Five", 300);
 
-console.log(Players.Players);
+for (let player of Players.Players) {
+  console.log(
+    `Player ${player.PlayerNo} is called ${player.PlayerName} has a score of ${
+      player.Score
+    } and their health is ${player.Health}`
+  );
+}
 
 const MAX_GHOSTS: integer = 100;
 
@@ -87,13 +93,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.text(4, 4, `Version : ${Version}`, { fontSize: '16px', fill: '#000' })
-    .setDepth(20000000)
-    .setScrollFactor(0, 0);
-    this.add.text(3, 3, `Version : ${Version}`, { fontSize: '16px', fill: '#fff' })
-    .setDepth(20000001)
-    .setScrollFactor(0, 0);
-    
+    this.add
+      .text(4, 4, `Version : ${Version}`, { fontSize: "16px", fill: "#000" })
+      .setDepth(20000000)
+      .setScrollFactor(0, 0);
+    this.add
+      .text(3, 3, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
+      .setDepth(20000001)
+      .setScrollFactor(0, 0);
+
     map = this.add.tilemap("testMap");
     mapTiles = map.addTilesetImage("test", "testTiles");
     mapLayerFloor = map

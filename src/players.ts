@@ -12,20 +12,20 @@ export abstract class Players {
   }
 
   public static set MaxPlayers(maxPlayers: number) {
-    Players._maxPlayers = maxPlayers;
+    Players._maxPlayers = maxPlayers ? maxPlayers : 1;
     Players._playerIndex = 0;
-    Players._players = new Array(maxPlayers - 1);
+    Players._players = new Array(Players._maxPlayers - 1);
   }
 
   public static get Players(): Player[] {
-    return Players._players;
+    return Players._players.slice(0, Players._playerIndex);
   }
 
-  public static CreatePlayer(): Player {
+  public static CreatePlayer(name?: string, startHealth?: number): Player {
     let player: Player;
 
     if (Players._playerIndex < Players._maxPlayers) {
-      player = new Player(Players._playerIndex);
+      player = new Player(Players._playerIndex, name, startHealth);
       Players._players[Players._playerIndex++] = player;
     } else {
       player = null;
@@ -36,11 +36,40 @@ export abstract class Players {
 }
 
 export class Player {
-  private _playerNo: number;
+  private _no: number;
+  private _name: string;
 
-  constructor(playerNo: number) {
-    console.log(`Player::Constructor(${playerNo})`);
+  private _score: number;
+  private _health: number;
 
-    this._playerNo = playerNo;
+  public constructor(no: number, name: string, startHealth?: number) {
+    this._no = no ? no : 0;
+    this._name = name ? name : "Player";
+    this._score = 0;
+    this._health = startHealth ? ((startHealth > 0) ? startHealth : 0) : 0;
+  }
+
+  public get PlayerNo() {
+    return this._no;
+  }
+
+  public get PlayerName() {
+    return this._name;
+  }
+
+  public get Score() {
+    return this._score;
+  }
+
+  public set Score(score: number) {
+    this._score = score;
+  }
+
+  public get Health() {
+    return this._health;
+  }
+
+  public set Health(health: number) {
+    this._health = health;
   }
 }
