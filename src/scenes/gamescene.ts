@@ -1,36 +1,15 @@
 import "phaser";
 import { Version } from "../version";
 import { Players, Player } from "../players";
+import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 var testJSON = require("../assets/maps/tiled/test.json");
 var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
 var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
-var logoPNG = require("../assets/images/logo.png");
 
-Players.MaxPlayers = 8;
-
-function playerIsDead(player: Player) : boolean
-{
-  console.log(`${player.Name} is dead!`);
-
-  return true;
-}
-
-Players.CreatePlayer("Player One", 500, playerIsDead);
-Players.CreatePlayer();
-Players.CreatePlayer("Player Three", 400, playerIsDead);
-Players.CreatePlayer("Player Four", -100, playerIsDead);
-Players.CreatePlayer("Player Five", 300, playerIsDead);
-
-for (let player of Players.Players) {
-  player.Health -= 400;
-  console.log(
-    `Player ${player.No} is called ${player.Name} has a score of ${
-      player.Score
-    } and their health is ${player.Health}`
-  );
-}
+Players.MaxPlayers = 4;
+Players.CreatePlayer('Player 1', 500);
 
 const MAX_GHOSTS: integer = 100;
 
@@ -45,7 +24,6 @@ var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
 var spriteVelocity = 150;
-var logo: Phaser.GameObjects.Sprite;
 var testSprite: Phaser.Physics.Arcade.Sprite;
 var ghostsGroup;
 var ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
@@ -89,7 +67,6 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON("testMap", testJSON);
     this.load.image("testTiles", testTilesPNG);
-    this.load.image("logo", logoPNG);
     this.load.spritesheet("testSprite", testSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
@@ -149,14 +126,13 @@ export default class GameScene extends Phaser.Scene {
     //     });
     // });
 
+    map.findObject('PlayerSpawns', (o) => {
+      // @ts-ignore
+      SpawnPoints.Add(new SpawnPoint(o.name, o.x * displayScale, o.y * displayScale));
+    });
+
     mapLayerWalls.setCollisionByExclusion([-1], true, true);
     mapLayerDoors.setCollisionByExclusion([-1], true, true);
-
-    logo = this.add
-      .sprite(window.innerWidth >> 1, window.innerHeight >> 2, "logo")
-      .setScale(displayScale, displayScale)
-      .setScrollFactor(0)
-      .setDepth(20000000);
 
     this.anims.create({
       key: "idleNorth",
@@ -239,7 +215,7 @@ export default class GameScene extends Phaser.Scene {
     );
 
     testSprite = this.physics.add
-      .sprite(320, 320, "testSprite", 2)
+      .sprite(SpawnPoints.SpawnPoint('Player 1').X, SpawnPoints.SpawnPoint('Player 1').Y, "testSprite", 2)
       .setScrollFactor(1, 1)
       .setDepth(5);
     testSprite.setSize(20, 32);
@@ -362,16 +338,6 @@ export default class GameScene extends Phaser.Scene {
 
     cursorKeys = this.input.keyboard.createCursorKeys();
 
-    this.tweens.add({
-      targets: logo,
-      scaleX: 1,
-      scaleY: 1,
-      ease: "Power2",
-      duration: 1000,
-      yoyo: -1,
-      repeat: -1
-    });
-
     this.cameras.main.setBounds(
       0,
       0,
@@ -464,12 +430,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (
       Math.abs(testSprite.body.velocity.x) +
-        Math.abs(testSprite.body.velocity.y) !=
-      0
-    ) {
-      logo.setAlpha(0);
-    } else {
-      logo.setAlpha(1);
+        Math.abs(testSprite.body.velocity.y) === 0) {
       testSprite.anims.play("idle" + testSpriteDirection);
     }
 

@@ -252,6 +252,8 @@
                  "x":608,
                  "y":192
                 }],
+         "offsetx":64,
+         "offsety":32,
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
@@ -266,7 +268,7 @@
                 {
                  "height":0,
                  "id":19,
-                 "name":"Player1",
+                 "name":"Player 1",
                  "point":true,
                  "properties":[
                         {
@@ -278,13 +280,13 @@
                  "type":"PlayerSpawn",
                  "visible":true,
                  "width":0,
-                 "x":128,
+                 "x":64,
                  "y":64
                 }, 
                 {
                  "height":0,
                  "id":20,
-                 "name":"Player2",
+                 "name":"Player 2",
                  "point":true,
                  "properties":[
                         {
@@ -302,7 +304,7 @@
                 {
                  "height":0,
                  "id":21,
-                 "name":"Player3",
+                 "name":"Player 3",
                  "point":true,
                  "properties":[
                         {
@@ -320,7 +322,7 @@
                 {
                  "height":0,
                  "id":22,
-                 "name":"Player4",
+                 "name":"Player 4",
                  "point":true,
                  "properties":[
                         {
@@ -342,7 +344,7 @@
          "y":0
         }],
  "nextlayerid":14,
- "nextobjectid":23,
+ "nextobjectid":24,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.4",
