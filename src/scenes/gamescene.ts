@@ -1,11 +1,14 @@
 import "phaser";
 import { Version } from "../version";
+import { Players, Player } from '../players'
 
 var testJSON = require("../assets/maps/tiled/test.json");
 var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
 var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
 var logoPNG = require("../assets/images/logo.png");
+
+let players = new Players();
 
 const MAX_GHOSTS: integer = 100;
 
