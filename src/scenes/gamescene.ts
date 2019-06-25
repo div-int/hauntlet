@@ -21,6 +21,7 @@ var mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
+var mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
 var spriteVelocity = 150;
@@ -96,15 +97,15 @@ export default class GameScene extends Phaser.Scene {
     mapLayerWalls = map
       .createDynamicLayer("Walls", mapTiles, 0, 0)
       .setScale(displayScale, displayScale)
-      .setDepth(2);
+      .setDepth(3);
     mapLayerExits = map
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(3);
+      .setDepth(4);
     mapLayerShadows = map
       .createStaticLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(4);
+      .setDepth(2);
     mapLayerItems = map
       .createStaticLayer("Items", mapTiles)
       .setScale(displayScale, displayScale)
@@ -113,6 +114,10 @@ export default class GameScene extends Phaser.Scene {
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(6);
+    mapLayerRoof = map
+      .createStaticLayer('Roof', mapTiles)
+      .setScale(displayScale, displayScale)
+      .setDepth(100000000);
 
     // const objects = map.findObject('Doors', (o) => {
     //     console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
