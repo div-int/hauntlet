@@ -7,6 +7,10 @@ export abstract class SpawnPoints {
     return SpawnPoints._spawnpoints;
   }
 
+  public static SpawnPoint(name: string) : SpawnPoint {
+    return SpawnPoints._spawnpoints.find(o => o.Name === name);
+  }
+
   public static Add(spawnpoint: SpawnPoint): number {
     return spawnpoint
       ? SpawnPoints._spawnpoints.push(spawnpoint)
