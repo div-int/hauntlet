@@ -22,6 +22,8 @@ var mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 var mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerRoofWalls: Phaser.Tilemaps.StaticTilemapLayer;
+var mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
 var spriteVelocity = 200;
@@ -114,6 +116,18 @@ export default class GameScene extends Phaser.Scene {
       .createStaticLayer("Roof", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(100000000);
+    mapLayerRoofShadows = map
+      .createStaticLayer("RoofShadows", mapTiles)
+      .setX(32)
+      .setY(32)
+      .setScale(displayScale, displayScale)
+      .setDepth(100000001);
+    mapLayerRoofWalls = map
+      .createStaticLayer("RoofWalls", mapTiles)
+      .setX(32)
+      .setY(32)
+      .setScale(displayScale, displayScale)
+      .setDepth(100000002);
 
     const objects = map.findObject("Doors", o => {
       // @ts-ignore
@@ -414,7 +428,7 @@ export default class GameScene extends Phaser.Scene {
     } else {
       testSprite.setAccelerationX(0);
       testSprite.setDamping(true);
-      testSprite.setDrag(1);
+      testSprite.setDrag(0.25);
       moving = false;
     }
 
@@ -435,7 +449,7 @@ export default class GameScene extends Phaser.Scene {
     } else {
       testSprite.setAccelerationY(0);
       testSprite.setDamping(true);
-      testSprite.setDrag(0.75);
+      testSprite.setDrag(0.25);
       testSprite.anims.msPerFrame = 300;
     }
 
