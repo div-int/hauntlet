@@ -11,7 +11,7 @@ var ghostSpritePNG = require("../assets/images/characters/ghost.png");
 Players.MaxPlayers = 4;
 Players.CreatePlayer('Player 1', 500);
 
-const MAX_GHOSTS: integer = 1000;
+const MAX_GHOSTS: integer = 250;
 
 var map: Phaser.Tilemaps.Tilemap;
 var mapTiles: Phaser.Tilemaps.Tileset;
