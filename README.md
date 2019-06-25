@@ -61,5 +61,5 @@ After you run the `npm run build` command, your code will be built into a single
 If you put the contents of the `dist` folder in a publicly-accessible location (say something like `http://mycoolserver.com`), 
 you should be able to open `http://mycoolserver.com/index.html` and play your game.
 
-[div-int-logo]: https://logo.divint.co.uk/divint-logo-256x256.png "Div Int Software"
-[hauntlet-logo]: https://logo.divint.co.uk/hauntlet.png (https://hauntlet.divint.co.uk)
+[div-int-logo]: https://assets.divint.co.uk/divint-logo-256x256.png "Div Int Software"
+[hauntlet-logo]: https://assets.divint.co.uk/hauntlet.png (https://hauntlet.divint.co.uk)
