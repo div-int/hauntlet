@@ -24,7 +24,7 @@ var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 var mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
-var spriteVelocity = 150;
+var spriteVelocity = 200;
 var testSprite: Phaser.Physics.Arcade.Sprite;
 var ghostsGroup;
 var ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
@@ -386,14 +386,14 @@ export default class GameScene extends Phaser.Scene {
     testSprite.setDepth(100 + testSprite.x + testSprite.y * map.widthInPixels);
 
     if (cursorKeys.right.isDown || moveRight) {
-      testSprite.setAccelerationX(spriteVelocity * 2);
+      testSprite.setAccelerationX(spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkEast" && moving === false) {
         testSprite.anims.play("walkEast");
       }
       testSpriteDirection = "East";
       moving = true;
     } else if (cursorKeys.left.isDown || moveLeft) {
-      testSprite.setAccelerationX(-spriteVelocity * 2);
+      testSprite.setAccelerationX(-spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkWest" && moving === false) {
         testSprite.anims.play("walkWest");
       }
@@ -402,19 +402,19 @@ export default class GameScene extends Phaser.Scene {
     } else {
       testSprite.setAccelerationX(0);
       testSprite.setDamping(true);
-      testSprite.setDrag(0.75);
+      testSprite.setDrag(1);
       moving = false;
     }
 
     if (cursorKeys.up.isDown || moveUp) {
-      testSprite.setAccelerationY(-spriteVelocity * 2);
+      testSprite.setAccelerationY(-spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkNorth" && moving === false) {
         testSprite.anims.play("walkNorth");
       }
       testSpriteDirection = "North";
       moving = true;
     } else if (cursorKeys.down.isDown || moveDown) {
-      testSprite.setAccelerationY(spriteVelocity * 2);
+      testSprite.setAccelerationY(spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkSouth" && moving === false) {
         testSprite.anims.play("walkSouth");
       }
