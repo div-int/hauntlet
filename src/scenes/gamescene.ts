@@ -4,12 +4,12 @@ import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 var testJSON = require("../assets/maps/tiled/test.json");
-var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
+var testTilesPNG = require("../assets/images/tiles/placeholder.png");
 var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
 
 Players.MaxPlayers = 4;
-Players.CreatePlayer('Player 1', 500);
+Players.CreatePlayer("Player 1", 500);
 
 const MAX_GHOSTS: integer = 100;
 
@@ -21,41 +21,38 @@ var mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
 var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
+var mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
-var spriteVelocity = 150;
+var spriteVelocity = 200;
 var testSprite: Phaser.Physics.Arcade.Sprite;
 var ghostsGroup;
 var ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 var testSpriteDirection = "South";
 var testSpritetakingDamage: Boolean = false;
 var cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
-// var doors = [];
+var doors = [];
 
-// function findDoorAt(x, y) {
-//     var foundDoorId;
+function findDoorAt(x, y) {
+  var foundDoorId: string;
 
-//     //console.log(`findDoorAt(${x}, ${y})`);
-//     Object.entries(doors).forEach((door) => {
-//         door[1].forEach((location) => {
-//             //console.log(location);
+  Object.entries(doors).forEach(door => {
+    door[1].forEach(location => {
+      if (x === location.x && y === location.y) {
+        foundDoorId = door[0];
+      }
+    });
+  });
 
-//             if ((x === location.x) && (y === location.y))
-//             {
-//                 foundDoorId = door[0];
-//             }
-//         });
-//     });
+  return foundDoorId;
+}
 
-//     return foundDoorId;
-// }
-
-// function removeDoor(doorId) {
-//     console.log(`removeDoor(${doorId})`);
-//     doors[doorId].forEach((location) => {
-//         mapLayerDoors.removeTileAt(location.x, location.y, false, true);
-//     });
-// }
+function removeDoor(doorId) {
+  console.log(`removeDoor(${doorId})`);
+  doors[doorId].forEach(location => {
+    mapLayerDoors.removeTileAt(location.x, location.y, false, true);
+  });
+}
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -96,15 +93,15 @@ export default class GameScene extends Phaser.Scene {
     mapLayerWalls = map
       .createDynamicLayer("Walls", mapTiles, 0, 0)
       .setScale(displayScale, displayScale)
-      .setDepth(2);
+      .setDepth(3);
     mapLayerExits = map
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(3);
+      .setDepth(4);
     mapLayerShadows = map
       .createStaticLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(4);
+      .setDepth(2);
     mapLayerItems = map
       .createStaticLayer("Items", mapTiles)
       .setScale(displayScale, displayScale)
@@ -113,22 +110,35 @@ export default class GameScene extends Phaser.Scene {
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(6);
+    mapLayerRoof = map
+      .createStaticLayer("Roof", mapTiles)
+      .setScale(displayScale, displayScale)
+      .setDepth(100000000);
 
-    // const objects = map.findObject('Doors', (o) => {
-    //     console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
-    //     mapLayerDoors.putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
-    //     if (typeof doors[o.name] == "undefined") {
-    //         doors[o.name] = new Array;
-    //     }
-    //     doors[o.name].push({
-    //         'x': o.x >> 5,
-    //         'y': (o.y >> 5) - 1
-    //     });
-    // });
-
-    map.findObject('PlayerSpawns', (o) => {
+    const objects = map.findObject("Doors", o => {
       // @ts-ignore
-      SpawnPoints.Add(new SpawnPoint(o.name, o.x * displayScale, o.y * displayScale));
+      console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
+      // @ts-ignore
+      mapLayerDoors.putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
+      // @ts-ignore
+      if (typeof doors[o.name] == "undefined") {
+        // @ts-ignore
+        doors[o.name] = new Array();
+      }
+      // @ts-ignore
+      doors[o.name].push({
+        // @ts-ignore
+        x: o.x >> 5,
+        // @ts-ignore
+        y: (o.y >> 5) - 1
+      });
+    });
+
+    map.findObject("PlayerSpawns", o => {
+      SpawnPoints.Add(
+        // @ts-ignore
+        new SpawnPoint(o.name, o.x * displayScale, o.y * displayScale)
+      );
     });
 
     mapLayerWalls.setCollisionByExclusion([-1], true, true);
@@ -215,7 +225,12 @@ export default class GameScene extends Phaser.Scene {
     );
 
     testSprite = this.physics.add
-      .sprite(SpawnPoints.SpawnPoint('Player 1').X, SpawnPoints.SpawnPoint('Player 1').Y, "testSprite", 2)
+      .sprite(
+        SpawnPoints.SpawnPoint("Player 1").X,
+        SpawnPoints.SpawnPoint("Player 1").Y,
+        "testSprite",
+        2
+      )
       .setScrollFactor(1, 1)
       .setDepth(5);
     testSprite.setSize(20, 32);
@@ -296,10 +311,12 @@ export default class GameScene extends Phaser.Scene {
       testSprite,
       mapLayerDoors,
       (o1, o2) => {
-        // if (o1.name === 'Player') {
-        //     removeDoor(findDoorAt(o2.x, o2.y));
-        //     console.log(o2.index,o2.x,o2.y);
-        // }
+        if (o1.name === "Player") {
+          // @ts-ignore
+          removeDoor(findDoorAt(o2.x, o2.y));
+          // @ts-ignore
+          console.log(o2.index, o2.x, o2.y);
+        }
       },
       null,
       this
@@ -359,18 +376,18 @@ export default class GameScene extends Phaser.Scene {
       var touchY = pointer.y;
       var worldPoint = this.cameras.main.getWorldPoint(touchX, touchY);
 
-      if (worldPoint.x < testSprite.x) {
+      if (worldPoint.x >> 4 < testSprite.x >> 4) {
         moveLeft = true;
         moveRight = false;
-      } else if (worldPoint.x > testSprite.x) {
+      } else if (worldPoint.x >> 4 > testSprite.x >> 4) {
         moveLeft = false;
         moveRight = true;
       }
 
-      if (worldPoint.y < testSprite.y) {
+      if (worldPoint.y >> 4 < testSprite.y >> 4) {
         moveUp = true;
         moveDown = false;
-      } else if (worldPoint.y > testSprite.y) {
+      } else if (worldPoint.y >> 4 > testSprite.y >> 4) {
         moveUp = false;
         moveDown = true;
       }
@@ -381,14 +398,14 @@ export default class GameScene extends Phaser.Scene {
     testSprite.setDepth(100 + testSprite.x + testSprite.y * map.widthInPixels);
 
     if (cursorKeys.right.isDown || moveRight) {
-      testSprite.setAccelerationX(spriteVelocity * 2);
+      testSprite.setAccelerationX(spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkEast" && moving === false) {
         testSprite.anims.play("walkEast");
       }
       testSpriteDirection = "East";
       moving = true;
     } else if (cursorKeys.left.isDown || moveLeft) {
-      testSprite.setAccelerationX(-spriteVelocity * 2);
+      testSprite.setAccelerationX(-spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkWest" && moving === false) {
         testSprite.anims.play("walkWest");
       }
@@ -397,19 +414,19 @@ export default class GameScene extends Phaser.Scene {
     } else {
       testSprite.setAccelerationX(0);
       testSprite.setDamping(true);
-      testSprite.setDrag(0.75);
+      testSprite.setDrag(1);
       moving = false;
     }
 
     if (cursorKeys.up.isDown || moveUp) {
-      testSprite.setAccelerationY(-spriteVelocity * 2);
+      testSprite.setAccelerationY(-spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkNorth" && moving === false) {
         testSprite.anims.play("walkNorth");
       }
       testSpriteDirection = "North";
       moving = true;
     } else if (cursorKeys.down.isDown || moveDown) {
-      testSprite.setAccelerationY(spriteVelocity * 2);
+      testSprite.setAccelerationY(spriteVelocity);
       if (testSprite.anims.currentAnim.key != "walkSouth" && moving === false) {
         testSprite.anims.play("walkSouth");
       }
@@ -430,7 +447,9 @@ export default class GameScene extends Phaser.Scene {
 
     if (
       Math.abs(testSprite.body.velocity.x) +
-        Math.abs(testSprite.body.velocity.y) === 0) {
+        Math.abs(testSprite.body.velocity.y) ===
+      0
+    ) {
       testSprite.anims.play("idle" + testSpriteDirection);
     }
 
