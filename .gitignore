@@ -66,3 +66,7 @@ dist/
 # temporary files
 *.*~
 *.swp
+tmp/
+
+# js files in src
+src/*.js

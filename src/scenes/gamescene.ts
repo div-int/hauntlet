@@ -1,10 +1,15 @@
 import "phaser";
+import { Version } from "../version";
+import { Players, Player } from "../players";
+import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 var testJSON = require("../assets/maps/tiled/test.json");
 var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
 var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
-var logoPNG = require("../assets/images/logo.png");
+
+Players.MaxPlayers = 4;
+Players.CreatePlayer('Player 1', 500);
 
 const MAX_GHOSTS: integer = 100;
 
@@ -19,7 +24,6 @@ var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 var displayScale = 2;
 var spriteScale = 1;
 var spriteVelocity = 150;
-var logo: Phaser.GameObjects.Sprite;
 var testSprite: Phaser.Physics.Arcade.Sprite;
 var ghostsGroup;
 var ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
@@ -56,12 +60,13 @@ var cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
+
+    console.log(`GameScene::constructor() : ${Version}`);
   }
 
   preload() {
     this.load.tilemapTiledJSON("testMap", testJSON);
     this.load.image("testTiles", testTilesPNG);
-    this.load.image("logo", logoPNG);
     this.load.spritesheet("testSprite", testSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
@@ -73,6 +78,15 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.add
+      .text(4, 4, `Version : ${Version}`, { fontSize: "16px", fill: "#000" })
+      .setDepth(20000000)
+      .setScrollFactor(0, 0);
+    this.add
+      .text(3, 3, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
+      .setDepth(20000001)
+      .setScrollFactor(0, 0);
+
     map = this.add.tilemap("testMap");
     mapTiles = map.addTilesetImage("test", "testTiles");
     mapLayerFloor = map
@@ -87,18 +101,18 @@ export default class GameScene extends Phaser.Scene {
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(3);
-    mapLayerItems = map
-      .createStaticLayer("Items", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(4);
     mapLayerShadows = map
       .createStaticLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(10000000);
+      .setDepth(4);
+    mapLayerItems = map
+      .createStaticLayer("Items", mapTiles)
+      .setScale(displayScale, displayScale)
+      .setDepth(5);
     mapLayerDoors = map
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(5);
+      .setDepth(6);
 
     // const objects = map.findObject('Doors', (o) => {
     //     console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
@@ -112,14 +126,13 @@ export default class GameScene extends Phaser.Scene {
     //     });
     // });
 
+    map.findObject('PlayerSpawns', (o) => {
+      // @ts-ignore
+      SpawnPoints.Add(new SpawnPoint(o.name, o.x * displayScale, o.y * displayScale));
+    });
+
     mapLayerWalls.setCollisionByExclusion([-1], true, true);
     mapLayerDoors.setCollisionByExclusion([-1], true, true);
-
-    logo = this.add
-      .sprite(window.innerWidth >> 1, window.innerHeight >> 2, "logo")
-      .setScale(displayScale, displayScale)
-      .setScrollFactor(0)
-      .setDepth(20000000);
 
     this.anims.create({
       key: "idleNorth",
@@ -202,7 +215,7 @@ export default class GameScene extends Phaser.Scene {
     );
 
     testSprite = this.physics.add
-      .sprite(320, 320, "testSprite", 2)
+      .sprite(SpawnPoints.SpawnPoint('Player 1').X, SpawnPoints.SpawnPoint('Player 1').Y, "testSprite", 2)
       .setScrollFactor(1, 1)
       .setDepth(5);
     testSprite.setSize(20, 32);
@@ -267,7 +280,7 @@ export default class GameScene extends Phaser.Scene {
         .setAlpha(0.7)
         .setScrollFactor(1, 1)
         .setDepth(5)
-        .setSize(10, 32)
+        .setSize(16, 32)
         .setOffset(14, 32)
         .setScale(spriteScale * 2, spriteScale)
         .setMaxVelocity(50);
@@ -324,16 +337,6 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(ghostsGroup, ghostsGroup);
 
     cursorKeys = this.input.keyboard.createCursorKeys();
-
-    this.tweens.add({
-      targets: logo,
-      scaleX: 1,
-      scaleY: 1,
-      ease: "Power2",
-      duration: 1000,
-      yoyo: -1,
-      repeat: -1
-    });
 
     this.cameras.main.setBounds(
       0,
@@ -427,12 +430,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (
       Math.abs(testSprite.body.velocity.x) +
-        Math.abs(testSprite.body.velocity.y) !=
-      0
-    ) {
-      logo.setAlpha(0);
-    } else {
-      logo.setAlpha(1);
+        Math.abs(testSprite.body.velocity.y) === 0) {
       testSprite.anims.play("idle" + testSpriteDirection);
     }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="13" nextobjectid="19">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="24">
  <tileset firstgid="1" name="test" tilewidth="32" tileheight="32" spacing="2" margin="1" tilecount="64" columns="8">
   <image source="../../images/tiles/test.extruded.png" width="272" height="272"/>
  </tileset>
@@ -343,7 +343,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="12" name="Doors">
+ <objectgroup id="12" name="Doors" offsetx="64" offsety="32">
   <object id="5" name="Door1" type="Doors" gid="21" x="320" y="64" width="32" height="32"/>
   <object id="6" name="Door1" type="Doors" gid="29" x="320" y="96" width="32" height="32"/>
   <object id="7" name="Door1" type="Doors" gid="29" x="320" y="128" width="32" height="32"/>
@@ -370,5 +370,31 @@
   <object id="15" name="Door4" type="Doors" gid="21" x="608" y="128" width="32" height="32"/>
   <object id="16" name="Door4" type="Doors" gid="29" x="608" y="160" width="32" height="32"/>
   <object id="17" name="Door4" type="Doors" gid="4" x="608" y="192" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="13" name="PlayerSpawns">
+  <object id="19" name="Player 1" type="PlayerSpawn" x="64" y="64">
+   <properties>
+    <property name="PlayerID" type="int" value="1"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="20" name="Player 2" type="PlayerSpawn" x="96" y="96">
+   <properties>
+    <property name="PlayerID" type="int" value="2"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="21" name="Player 3" type="PlayerSpawn" x="128" y="128">
+   <properties>
+    <property name="PlayerID" type="int" value="3"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="22" name="Player 4" type="PlayerSpawn" x="96" y="160">
+   <properties>
+    <property name="PlayerID" type="int" value="4"/>
+   </properties>
+   <point/>
+  </object>
  </objectgroup>
 </map>
