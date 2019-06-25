@@ -70,3 +70,6 @@ tmp/
 
 # js files in src
 src/*.js
+
+# Mac OS thumbnails
+*.DS_Store
