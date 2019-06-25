@@ -4,7 +4,7 @@ import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 var testJSON = require("../assets/maps/tiled/test.json");
-var testTilesPNG = require("../assets/images/tiles/test.extruded.png");
+var testTilesPNG = require("../assets/images/tiles/placeholder.png");
 var testSpritePNG = require("../assets/images/characters/test.png");
 var ghostSpritePNG = require("../assets/images/characters/ghost.png");
 
