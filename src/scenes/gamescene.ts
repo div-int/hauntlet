@@ -280,7 +280,7 @@ export default class GameScene extends Phaser.Scene {
         .setAlpha(0.7)
         .setScrollFactor(1, 1)
         .setDepth(5)
-        .setSize(10, 32)
+        .setSize(16, 32)
         .setOffset(14, 32)
         .setScale(spriteScale * 2, spriteScale)
         .setMaxVelocity(50);
