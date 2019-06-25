@@ -1,7 +1,9 @@
-## [Hauntlet](https://hauntlet.divint.co.uk)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/20f7c433-f96a-4013-969b-d6d2dfe31d6d/deploy-status)](https://app.netlify.com/sites/wizardly-spence-113131/deploys)
-
-# Hauntlet retro arcade game
+***
+![alt text][div-int-logo]
+***
+# [Hauntlet](https://hauntlet.divint.co.uk)
+## Hauntlet retro arcade game
 
 A Phaser 3 game built upon a project template with Typescript support, ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
 that includes hot-reloading for development and production-ready builds.
@@ -56,3 +58,5 @@ After you run the `npm run build` command, your code will be built into a single
 
 If you put the contents of the `dist` folder in a publicly-accessible location (say something like `http://mycoolserver.com`), 
 you should be able to open `http://mycoolserver.com/index.html` and play your game.
+
+[div-int-logo]: https://logo.divint.co.uk/divint-logo-256x256.png
