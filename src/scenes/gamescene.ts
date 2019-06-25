@@ -364,18 +364,18 @@ export default class GameScene extends Phaser.Scene {
       var touchY = pointer.y;
       var worldPoint = this.cameras.main.getWorldPoint(touchX, touchY);
 
-      if (worldPoint.x < testSprite.x) {
+      if (worldPoint.x>>4 < testSprite.x>>4) {
         moveLeft = true;
         moveRight = false;
-      } else if (worldPoint.x > testSprite.x) {
+      } else if (worldPoint.x>>4 > testSprite.x>>4) {
         moveLeft = false;
         moveRight = true;
       }
 
-      if (worldPoint.y < testSprite.y) {
+      if (worldPoint.y>>4 < testSprite.y>>4) {
         moveUp = true;
         moveDown = false;
-      } else if (worldPoint.y > testSprite.y) {
+      } else if (worldPoint.y>>4 > testSprite.y>>4) {
         moveUp = false;
         moveDown = true;
       }
