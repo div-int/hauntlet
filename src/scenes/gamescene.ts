@@ -95,15 +95,15 @@ export default class GameScene extends Phaser.Scene {
     mapLayerWalls = map
       .createDynamicLayer("Walls", mapTiles, 0, 0)
       .setScale(displayScale, displayScale)
-      .setDepth(3);
+      .setDepth(2);
     mapLayerExits = map
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(4);
+      .setDepth(3);
     mapLayerShadows = map
       .createStaticLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(2);
+      .setDepth(4);
     mapLayerItems = map
       .createStaticLayer("Items", mapTiles)
       .setScale(displayScale, displayScale)
@@ -247,13 +247,15 @@ export default class GameScene extends Phaser.Scene {
       )
       .setScrollFactor(1, 1)
       .setDepth(5);
-    testSprite.setSize(20, 32);
-    testSprite.setOffset(28, 32);
-    testSprite.setScale(spriteScale, spriteScale);
-    testSprite.anims.play("idleSouth");
-    testSprite.setCollideWorldBounds(true);
-    testSprite.setMaxVelocity(spriteVelocity);
-    testSprite.name = "Player";
+
+    testSprite
+      .setSize(20, 32)
+      .setOffset(28, 32)
+      .setScale(spriteScale, spriteScale)
+      .setMaxVelocity(spriteVelocity)
+      .setCollideWorldBounds(true)
+      .anims.play("idleSouth");
+    testSprite.name = "Player"
 
     this.anims.create({
       key: "ghostMoveSouth",
