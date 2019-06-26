@@ -121,13 +121,13 @@ export default class GameScene extends Phaser.Scene {
       .setX(32)
       .setY(32)
       .setScale(displayScale, displayScale)
-      .setDepth(100000001);
+      .setDepth(7);
     mapLayerRoofWalls = map
       .createStaticLayer("RoofWalls", mapTiles)
       .setX(32)
       .setY(32)
       .setScale(displayScale, displayScale)
-      .setDepth(100000002);
+      .setDepth(100000001);
 
     const objects = map.findObject("Doors", o => {
       // @ts-ignore
