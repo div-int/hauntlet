@@ -3,40 +3,40 @@ import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
-var testJSON = require("../assets/maps/tiled/test.json");
-var testTilesPNG = require("../assets/images/tiles/placeholder.png");
-var testSpritePNG = require("../assets/images/characters/test.png");
-var ghostSpritePNG = require("../assets/images/characters/ghost.png");
+let testJSON = require("../assets/maps/tiled/test.json");
+let testTilesPNG = require("../assets/images/tiles/placeholder.png");
+let testSpritePNG = require("../assets/images/characters/test.png");
+let ghostSpritePNG = require("../assets/images/characters/ghost.png");
 
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
 const MAX_GHOSTS: integer = 100;
 
-var map: Phaser.Tilemaps.Tilemap;
-var mapTiles: Phaser.Tilemaps.Tileset;
-var mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
-var mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
-var mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerRoofWalls: Phaser.Tilemaps.StaticTilemapLayer;
-var mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
-var displayScale = 2;
-var spriteScale = 1;
-var spriteVelocity = 200;
-var testSprite: Phaser.Physics.Arcade.Sprite;
-var ghostsGroup;
-var ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
-var testSpriteDirection = "South";
-var testSpritetakingDamage: Boolean = false;
-var cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
-var doors = [];
+let map: Phaser.Tilemaps.Tilemap;
+let mapTiles: Phaser.Tilemaps.Tileset;
+let mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
+let mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
+let mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerRoofWalls: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
+let displayScale = 2;
+let spriteScale = 1;
+let spriteVelocity = 200;
+let testSprite: Phaser.Physics.Arcade.Sprite;
+let ghostsGroup;
+let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
+let testSpriteDirection = "South";
+let testSpritetakingDamage: Boolean = false;
+let cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+let doors = [];
 
 function findDoorAt(x, y) {
-  var foundDoorId: string;
+  let foundDoorId: string;
 
   Object.entries(doors).forEach(door => {
     door[1].forEach(location => {
@@ -300,7 +300,7 @@ export default class GameScene extends Phaser.Scene {
       bounceY: 1
     });
 
-    for (var i = 0; i < MAX_GHOSTS; i++) {
+    for (let i = 0; i < MAX_GHOSTS; i++) {
       ghostSprites[i] = this.physics.add
         .sprite(
           Phaser.Math.Between(32, 64) * 32,
@@ -381,16 +381,16 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    var pointer = this.input.activePointer;
-    var moveLeft = false;
-    var moveRight = false;
-    var moveUp = false;
-    var moveDown = false;
+    let pointer = this.input.activePointer;
+    let moveLeft = false;
+    let moveRight = false;
+    let moveUp = false;
+    let moveDown = false;
 
     if (pointer.isDown) {
-      var touchX = pointer.x;
-      var touchY = pointer.y;
-      var worldPoint = this.cameras.main.getWorldPoint(touchX, touchY);
+      let touchX = pointer.x;
+      let touchY = pointer.y;
+      let worldPoint = this.cameras.main.getWorldPoint(touchX, touchY);
 
       if (worldPoint.x >> 4 < testSprite.x >> 4) {
         moveLeft = true;
@@ -409,7 +409,7 @@ export default class GameScene extends Phaser.Scene {
       }
     }
 
-    var moving = false;
+    let moving = false;
 
     testSprite.setDepth(100 + testSprite.x + testSprite.y * map.widthInPixels);
 
@@ -469,9 +469,9 @@ export default class GameScene extends Phaser.Scene {
       testSprite.anims.play("idle" + testSpriteDirection);
     }
 
-    var ghostXDiff, ghostYDiff;
+    let ghostXDiff, ghostYDiff;
 
-    for (var i = 0; i < MAX_GHOSTS; i++) {
+    for (let i = 0; i < MAX_GHOSTS; i++) {
       ghostSprites[i].setDepth(
         100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
       );
