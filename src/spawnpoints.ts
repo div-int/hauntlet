@@ -7,7 +7,7 @@ export abstract class SpawnPoints {
     return SpawnPoints._spawnpoints;
   }
 
-  public static SpawnPoint(name: string) : SpawnPoint {
+  public static SpawnPoint(name: string): SpawnPoint {
     return SpawnPoints._spawnpoints.find(o => o.Name === name);
   }
 
@@ -17,8 +17,9 @@ export abstract class SpawnPoints {
       : SpawnPoints._spawnpoints.length;
   }
 
+  // TODO
   public static Remove(spawnpoint: SpawnPoint): number {
-      return 0;
+    return 0;
   }
 }
 
