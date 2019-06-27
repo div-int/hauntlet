@@ -12,7 +12,7 @@ let swordSpritePNG = require("../assets/images/weapons/sword.png");
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 2000;
+const MAX_GHOSTS: integer = 100;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
@@ -246,13 +246,16 @@ export default class GameScene extends Phaser.Scene {
 
     swordSprite = this.physics.add
     .sprite(
-      64,
-      64,
+      64 * spriteScale,
+      64 * spriteScale,
       "swordSprite",
-      0
+      5
     )
     .setScrollFactor(0,0)
     .setDepth(5);
+
+    swordSprite
+      .setScale(spriteScale, spriteScale);
 
     testSprite = this.physics.add
       .sprite(
