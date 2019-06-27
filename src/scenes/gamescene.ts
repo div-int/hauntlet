@@ -7,11 +7,12 @@ let testJSON = require("../assets/maps/tiled/test.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
 let testSpritePNG = require("../assets/images/characters/test.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
+let swordSpritePNG = require("../assets/images/weapons/sword.png");
 
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 100;
+const MAX_GHOSTS: integer = 2000;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
@@ -27,6 +28,7 @@ let mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
 let displayScale = 2;
 let spriteScale = 1;
 let spriteVelocity = 200;
+let swordSprite: Phaser.Physics.Arcade.Sprite;
 let testSprite: Phaser.Physics.Arcade.Sprite;
 let ghostsGroup;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
@@ -73,6 +75,10 @@ export default class GameScene extends Phaser.Scene {
     this.load.spritesheet("ghostSprite", ghostSpritePNG, {
       frameWidth: 32,
       frameHeight: 64
+    });
+    this.load.spritesheet("swordSprite", swordSpritePNG, {
+      frameWidth: 16,
+      frameHeight: 16
     });
   }
 
@@ -238,6 +244,16 @@ export default class GameScene extends Phaser.Scene {
       map.heightInPixels * displayScale
     );
 
+    swordSprite = this.physics.add
+    .sprite(
+      64,
+      64,
+      "swordSprite",
+      0
+    )
+    .setScrollFactor(0,0)
+    .setDepth(5);
+
     testSprite = this.physics.add
       .sprite(
         SpawnPoints.SpawnPoint("Player 1").X,
@@ -303,8 +319,8 @@ export default class GameScene extends Phaser.Scene {
     for (let i = 0; i < MAX_GHOSTS; i++) {
       ghostSprites[i] = this.physics.add
         .sprite(
-          Phaser.Math.Between(32, 64) * 32,
-          Phaser.Math.Between(32, 64) * 32,
+          Phaser.Math.Between(16, 128) * 32,
+          Phaser.Math.Between(16, 128) * 32,
           "ghostSprite",
           0
         )
