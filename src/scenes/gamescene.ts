@@ -28,13 +28,17 @@ let mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
 let displayScale = 2;
 let spriteScale = 1;
 let spriteVelocity = 200;
-let swordSprite: Phaser.Physics.Arcade.Sprite;
+let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let testSprite: Phaser.Physics.Arcade.Sprite;
 let ghostsGroup;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let testSpriteDirection = "South";
 let testSpritetakingDamage: Boolean = false;
 let cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+let fireKey: Phaser.Input.Keyboard.Key;
+let firePressed = false;
+let fireClicked = false;
+let fireGroup;
 let doors = [];
 
 function findDoorAt(x, y) {
@@ -77,8 +81,8 @@ export default class GameScene extends Phaser.Scene {
       frameHeight: 64
     });
     this.load.spritesheet("swordSprite", swordSpritePNG, {
-      frameWidth: 16,
-      frameHeight: 16
+      frameWidth: 18,
+      frameHeight: 18
     });
   }
 
@@ -117,7 +121,7 @@ export default class GameScene extends Phaser.Scene {
     mapLayerDoors = map
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(6);
+      .setDepth(10);
     mapLayerRoof = map
       .createStaticLayer("Roof", mapTiles)
       .setScale(displayScale, displayScale)
@@ -244,19 +248,6 @@ export default class GameScene extends Phaser.Scene {
       map.heightInPixels * displayScale
     );
 
-    swordSprite = this.physics.add
-    .sprite(
-      64 * spriteScale,
-      64 * spriteScale,
-      "swordSprite",
-      5
-    )
-    .setScrollFactor(0,0)
-    .setDepth(5);
-
-    swordSprite
-      .setScale(spriteScale, spriteScale);
-
     testSprite = this.physics.add
       .sprite(
         SpawnPoints.SpawnPoint("Player 1").X,
@@ -265,7 +256,7 @@ export default class GameScene extends Phaser.Scene {
         2
       )
       .setScrollFactor(1, 1)
-      .setDepth(5);
+      .setDepth(7);
 
     testSprite
       .setSize(20, 32)
@@ -274,7 +265,23 @@ export default class GameScene extends Phaser.Scene {
       .setMaxVelocity(spriteVelocity)
       .setCollideWorldBounds(true)
       .anims.play("idleSouth");
-    testSprite.name = "Player"
+    testSprite.name = "Player";
+
+    fireGroup = this.physics.add.group({
+      immovable: false,
+      bounceX: 0,
+      bounceY: 0
+    });
+
+    this.physics.add.collider(
+      fireGroup,
+      mapLayerWalls,
+      (sword: Phaser.Physics.Arcade.Sprite, tile) => {
+        //console.log(sword, tile);
+        sword.destroy();
+      }
+    );
+    this.physics.add.collider(fireGroup, mapLayerDoors);
 
     this.anims.create({
       key: "ghostMoveSouth",
@@ -350,12 +357,25 @@ export default class GameScene extends Phaser.Scene {
           // @ts-ignore
           removeDoor(findDoorAt(o2.x, o2.y));
           // @ts-ignore
-          console.log(o2.index, o2.x, o2.y);
+          //console.log(o2.index, o2.x, o2.y);
         }
       },
       null,
       this
     );
+    this.physics.add.collider(
+      ghostsGroup,
+      fireGroup,
+      (
+        ghost: Phaser.Physics.Arcade.Sprite,
+        sword: Phaser.Physics.Arcade.Sprite
+      ) => {
+        //console.log(ghost, sword);
+        sword.destroy();
+        ghost.destroy();
+      }
+    );
+
     this.physics.add.collider(ghostsGroup, mapLayerDoors);
     this.physics.add.collider(
       testSprite,
@@ -389,6 +409,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(ghostsGroup, ghostsGroup);
 
     cursorKeys = this.input.keyboard.createCursorKeys();
+    fireKey = this.input.keyboard.addKey("A");
 
     this.cameras.main.setBounds(
       0,
@@ -405,6 +426,8 @@ export default class GameScene extends Phaser.Scene {
     let moveRight = false;
     let moveUp = false;
     let moveDown = false;
+    let fireDirection = 0;
+    let moving = false;
 
     if (pointer.isDown) {
       let touchX = pointer.x;
@@ -414,64 +437,102 @@ export default class GameScene extends Phaser.Scene {
       if (worldPoint.x >> 4 < testSprite.x >> 4) {
         moveLeft = true;
         moveRight = false;
+        if (!fireClicked) {
+          fireDirection |= 4;
+        }
       } else if (worldPoint.x >> 4 > testSprite.x >> 4) {
         moveLeft = false;
         moveRight = true;
+        if (!fireClicked) {
+          fireDirection |= 1;
+        }
       }
 
       if (worldPoint.y >> 4 < testSprite.y >> 4) {
         moveUp = true;
         moveDown = false;
+        if (!fireClicked) {
+          fireDirection |= 8;
+        }
       } else if (worldPoint.y >> 4 > testSprite.y >> 4) {
         moveUp = false;
         moveDown = true;
+        if (!fireClicked) {
+          fireDirection |= 2;
+        }
       }
+      fireClicked = true;
+    } else {
+      fireClicked = false;
     }
-
-    let moving = false;
 
     testSprite.setDepth(100 + testSprite.x + testSprite.y * map.widthInPixels);
 
+    if (fireKey.isUp) {
+      firePressed = false;
+    }
+
     if (cursorKeys.right.isDown || moveRight) {
-      testSprite.setAccelerationX(spriteVelocity);
-      if (testSprite.anims.currentAnim.key != "walkEast" && moving === false) {
-        testSprite.anims.play("walkEast");
+      if (fireKey.isUp) {
+        testSprite.setVelocityX(spriteVelocity);
+        if (testSprite.anims.currentAnim.key != "walkEast" && !moving) {
+          testSprite.anims.play("walkEast");
+        }
+        testSpriteDirection = "East";
+        moving = true;
       }
-      testSpriteDirection = "East";
-      moving = true;
+      if (fireKey.isDown && !firePressed) {
+        testSprite.setVelocityX(0);
+        fireDirection |= 1;
+      }
     } else if (cursorKeys.left.isDown || moveLeft) {
-      testSprite.setAccelerationX(-spriteVelocity);
-      if (testSprite.anims.currentAnim.key != "walkWest" && moving === false) {
-        testSprite.anims.play("walkWest");
+      if (fireKey.isUp) {
+        testSprite.setVelocityX(-spriteVelocity);
+        if (testSprite.anims.currentAnim.key != "walkWest" && !moving) {
+          testSprite.anims.play("walkWest");
+        }
+        testSpriteDirection = "West";
+        moving = true;
       }
-      testSpriteDirection = "West";
-      moving = true;
+      if (fireKey.isDown && !firePressed) {
+        testSprite.setVelocityX(0);
+        fireDirection |= 4;
+      }
     } else {
-      testSprite.setAccelerationX(0);
-      testSprite.setDamping(true);
-      testSprite.setDrag(0.25);
+      testSprite.setVelocityX(0);
       moving = false;
     }
 
     if (cursorKeys.up.isDown || moveUp) {
-      testSprite.setAccelerationY(-spriteVelocity);
+      testSprite.setVelocityY(-spriteVelocity);
+      if (fireKey.isDown && !firePressed) {
+        testSprite.setVelocityY(0);
+        fireDirection |= 8;
+        firePressed = true;
+      }
       if (testSprite.anims.currentAnim.key != "walkNorth" && moving === false) {
         testSprite.anims.play("walkNorth");
       }
       testSpriteDirection = "North";
       moving = true;
     } else if (cursorKeys.down.isDown || moveDown) {
-      testSprite.setAccelerationY(spriteVelocity);
+      testSprite.setVelocityY(spriteVelocity);
+      if (fireKey.isDown && !firePressed) {
+        testSprite.setVelocityY(0);
+        fireDirection |= 2;
+        firePressed = true;
+      }
       if (testSprite.anims.currentAnim.key != "walkSouth" && moving === false) {
         testSprite.anims.play("walkSouth");
       }
       testSpriteDirection = "South";
       moving = true;
     } else {
-      testSprite.setAccelerationY(0);
-      testSprite.setDamping(true);
-      testSprite.setDrag(0.25);
-      testSprite.anims.msPerFrame = 300;
+      testSprite.setVelocityY(0);
+    }
+
+    if (fireKey.isDown) {
+      firePressed = true;
     }
 
     if (moving === true) {
@@ -488,56 +549,98 @@ export default class GameScene extends Phaser.Scene {
       testSprite.anims.play("idle" + testSpriteDirection);
     }
 
+    if (fireDirection) {
+      let fireFrame = 4;
+      let vx = 0;
+      let vy = 0;
+
+      if (fireDirection & 1) {
+        vx = 500;
+        fireFrame++;
+      }
+      if (fireDirection & 2) {
+        vy = 500;
+        fireFrame += 3;
+      }
+      if (fireDirection & 4) {
+        vx = -500;
+        fireFrame--;
+      }
+      if (fireDirection & 8) {
+        vy = -500;
+        fireFrame -= 3;
+      }
+
+      let newSword = this.physics.add.sprite(
+        testSprite.x,
+        testSprite.y,
+        "swordSprite",
+        fireFrame
+      );
+      fireGroup.add(newSword, false);
+
+      newSword
+        .setDepth(6)
+        .setVelocityX(vx)
+        .setVelocityY(vy)
+        .setCollideWorldBounds(true);
+
+      firePressed = true;
+    }
+
     let ghostXDiff, ghostYDiff;
 
     for (let i = 0; i < MAX_GHOSTS; i++) {
-      ghostSprites[i].setDepth(
-        100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
-      );
-      ghostXDiff = ghostSprites[i].x - testSprite.x;
-      ghostYDiff = ghostSprites[i].y - testSprite.y;
+      //console.log(ghostSprites[i]);
+      if (ghostSprites[i].active) {
+        ghostSprites[i].setDepth(
+          100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
+        );
+        ghostXDiff = ghostSprites[i].x - testSprite.x;
+        ghostYDiff = ghostSprites[i].y - testSprite.y;
 
-      if (ghostXDiff < 16) {
-        ghostSprites[i].setDamping(false);
-        ghostSprites[i].setAccelerationX(Phaser.Math.Between(10, 100));
-      } else if (ghostXDiff > 16) {
-        ghostSprites[i].setDamping(false);
-        ghostSprites[i].setAccelerationX(-Phaser.Math.Between(10, 100));
-      } else {
-        ghostSprites[i].setAccelerationX(0);
-        ghostSprites[i].setDamping(true);
-        ghostSprites[i].setDrag(0.25);
-      }
-      if (ghostYDiff < 16) {
-        ghostSprites[i].setDamping(false);
-        ghostSprites[i].setAccelerationY(Phaser.Math.Between(10, 100));
-      } else if (ghostYDiff > 16) {
-        ghostSprites[i].setDamping(false);
-        ghostSprites[i].setAccelerationY(-Phaser.Math.Between(10, 100));
-      } else {
-        ghostSprites[i].setAccelerationY(0);
-        ghostSprites[i].setDamping(true);
-        ghostSprites[i].setDrag(0.25);
-      }
-
-      if (Math.abs(ghostXDiff) > Math.abs(ghostYDiff)) {
-        if (ghostXDiff < 0) {
-          if (ghostSprites[i].anims.currentAnim.key != "ghostMoveEast") {
-            ghostSprites[i].anims.play("ghostMoveEast");
-          }
+        if (ghostXDiff < 16) {
+          ghostSprites[i].setDamping(false);
+          ghostSprites[i].setAccelerationX(Phaser.Math.Between(10, 100));
+        } else if (ghostXDiff > 16) {
+          ghostSprites[i].setDamping(false);
+          ghostSprites[i].setAccelerationX(-Phaser.Math.Between(10, 100));
         } else {
-          if (ghostSprites[i].anims.currentAnim.key != "ghostMoveWest") {
-            ghostSprites[i].anims.play("ghostMoveWest");
-          }
+          ghostSprites[i].setAccelerationX(0);
+          ghostSprites[i].setDamping(true);
+          ghostSprites[i].setDrag(0.25);
         }
-      } else {
-        if (ghostYDiff < 0) {
-          if (ghostSprites[i].anims.currentAnim.key != "ghostMoveSouth") {
-            ghostSprites[i].anims.play("ghostMoveSouth");
+        if (ghostYDiff < 16) {
+          ghostSprites[i].setDamping(false);
+          ghostSprites[i].setAccelerationY(Phaser.Math.Between(10, 100));
+        } else if (ghostYDiff > 16) {
+          ghostSprites[i].setDamping(false);
+          ghostSprites[i].setAccelerationY(-Phaser.Math.Between(10, 100));
+        } else {
+          ghostSprites[i].setAccelerationY(0);
+          ghostSprites[i].setDamping(true);
+          ghostSprites[i].setDrag(0.25);
+        }
+
+        if (Math.abs(ghostXDiff) > Math.abs(ghostYDiff)) {
+          if (ghostXDiff < 0) {
+            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveEast") {
+              ghostSprites[i].anims.play("ghostMoveEast");
+            }
+          } else {
+            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveWest") {
+              ghostSprites[i].anims.play("ghostMoveWest");
+            }
           }
         } else {
-          if (ghostSprites[i].anims.currentAnim.key != "ghostMoveNorth") {
-            ghostSprites[i].anims.play("ghostMoveNorth");
+          if (ghostYDiff < 0) {
+            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveSouth") {
+              ghostSprites[i].anims.play("ghostMoveSouth");
+            }
+          } else {
+            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveNorth") {
+              ghostSprites[i].anims.play("ghostMoveNorth");
+            }
           }
         }
       }
