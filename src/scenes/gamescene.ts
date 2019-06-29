@@ -281,7 +281,12 @@ export default class GameScene extends Phaser.Scene {
         sword.destroy();
       }
     );
-    this.physics.add.collider(fireGroup, mapLayerDoors);
+    this.physics.add.collider(fireGroup, mapLayerDoor,
+	(sword: Phaser.Physics.Arcade.Sprite, door) => {
+        //console.log(sword, door;
+        sword.destroy();
+      }
+    );
 
     this.anims.create({
       key: "ghostMoveSouth",
