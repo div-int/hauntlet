@@ -585,6 +585,7 @@ export default class GameScene extends Phaser.Scene {
 
       newSword
         .setDepth(6)
+	.setScale(1, 1)
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
