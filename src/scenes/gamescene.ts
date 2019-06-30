@@ -281,9 +281,8 @@ export default class GameScene extends Phaser.Scene {
         sword.destroy();
       }
     );
-    this.physics.add.collider(fireGroup, mapLayerDoor,
+    this.physics.add.collider(fireGroup, mapLayerDoors,
 	(sword: Phaser.Physics.Arcade.Sprite, door) => {
-        //console.log(sword, door;
         sword.destroy();
       }
     );
