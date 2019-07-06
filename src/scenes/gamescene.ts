@@ -14,7 +14,7 @@ let swordSpritePNG = require("../assets/images/weapons/sword.png");
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 100;
+const MAX_GHOSTS: integer = 256;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
@@ -321,19 +321,12 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
 
-    skeletonSprite = this.physics.add
-      .sprite(128, 128, "skeletonSprite", 0)
-      .setScrollFactor(0, 0)
-      .setDepth(7);
-
     this.physics.world.setBounds(
       0,
       0,
       map.widthInPixels * displayScale,
       map.heightInPixels * displayScale
     );
-
-    skeletonSprite.play("skeletonWalkEast");
 
     knightSprite = this.physics.add
       .sprite(
@@ -376,14 +369,6 @@ export default class GameScene extends Phaser.Scene {
       }
     );
 
-    this.physics.world.on(
-      "worldbounds",
-      body => {
-        console.log("World bounds collision : ", body);
-      },
-      this
-    );
-
     this.anims.create({
       key: "ghostMoveSouth",
       frames: this.anims.generateFrameNumbers("ghostSprite", {
@@ -423,8 +408,8 @@ export default class GameScene extends Phaser.Scene {
 
     ghostsGroup = this.physics.add.group({
       immovable: false,
-      bounceX: 1,
-      bounceY: 1
+      bounceX: 0.0,
+      bounceY: 0.0
     });
 
     for (let i = 0; i < MAX_GHOSTS; i++) {
@@ -438,13 +423,17 @@ export default class GameScene extends Phaser.Scene {
         .setAlpha(1.0) //.setAlpha(0.7)
         .setScrollFactor(1, 1)
         .setDepth(5)
-        .setSize(16, 32)
-        .setOffset(14, 32)
+        .setSize(24, 32)
+        .setOffset(24, 32)
         .setScale(spriteScale, spriteScale) //.setScale(spriteScale * 2, spriteScale)
-        .setMaxVelocity(50);
+        .setMaxVelocity(100);
       ghostSprites[i].name = "Ghost";
-      ghostSprites[i].anims.play("ghostMoveSouth");
       ghostSprites[i].setCollideWorldBounds(true);
+      ghostSprites[i].play(
+        "skeletonWalkSouth",
+        false,
+        Phaser.Math.Between(0, 8)
+      );
       ghostsGroup.add(ghostSprites[i], false);
     }
 
@@ -735,21 +724,37 @@ export default class GameScene extends Phaser.Scene {
         if (Math.abs(ghostXDiff) > Math.abs(ghostYDiff)) {
           if (ghostXDiff < 0) {
             if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkEast") {
-              ghostSprites[i].anims.play("skeletonWalkEast");
+              ghostSprites[i].anims.play(
+                "skeletonWalkEast",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           } else {
             if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkWest") {
-              ghostSprites[i].anims.play("skeletonWalkWest");
+              ghostSprites[i].anims.play(
+                "skeletonWalkWest",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           }
         } else {
           if (ghostYDiff < 0) {
             if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkSouth") {
-              ghostSprites[i].anims.play("skeletonWalkSouth");
+              ghostSprites[i].anims.play(
+                "skeletonWalkSouth",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           } else {
             if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkNorth") {
-              ghostSprites[i].anims.play("skeletonWalkNorth");
+              ghostSprites[i].anims.play(
+                "skeletonWalkNorth",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           }
         }
