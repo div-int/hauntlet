@@ -2,7 +2,6 @@ import "phaser";
 import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
-import { CLIENT_RENEG_LIMIT } from "tls";
 
 let testJSON = require("../assets/maps/tiled/test.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
