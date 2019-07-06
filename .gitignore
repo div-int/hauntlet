@@ -73,3 +73,5 @@ src/*.js
 
 # Mac OS thumbnails
 *.DS_Store
+
+.firebase/
