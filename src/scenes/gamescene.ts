@@ -2,6 +2,7 @@ import "phaser";
 import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
+import { CLIENT_RENEG_LIMIT } from "tls";
 
 let testJSON = require("../assets/maps/tiled/test.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
@@ -281,10 +282,20 @@ export default class GameScene extends Phaser.Scene {
         sword.destroy();
       }
     );
-    this.physics.add.collider(fireGroup, mapLayerDoors,
-	(sword: Phaser.Physics.Arcade.Sprite, door) => {
+    this.physics.add.collider(
+      fireGroup,
+      mapLayerDoors,
+      (sword: Phaser.Physics.Arcade.Sprite, door) => {
         sword.destroy();
       }
+    );
+
+    this.physics.world.on(
+      "worldbounds",
+      body => {
+        console.log("World bounds collision : ", body);
+      },
+      this
     );
 
     this.anims.create({
@@ -585,7 +596,7 @@ export default class GameScene extends Phaser.Scene {
 
       newSword
         .setDepth(6)
-	.setScale(1, 1)
+        .setScale(1, 1)
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
