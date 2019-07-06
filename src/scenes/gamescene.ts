@@ -5,14 +5,15 @@ import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 let testJSON = require("../assets/maps/tiled/test.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
-let testSpritePNG = require("../assets/images/characters/test.png");
+let knightSpritePNG = require("../assets/images/characters/test.png");
+let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
 let swordSpritePNG = require("../assets/images/weapons/sword.png");
 
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 100;
+const MAX_GHOSTS: integer = 256;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
@@ -29,11 +30,12 @@ let displayScale = 2;
 let spriteScale = 1;
 let spriteVelocity = 200;
 let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
-let testSprite: Phaser.Physics.Arcade.Sprite;
+let knightSprite: Phaser.Physics.Arcade.Sprite;
+let skeletonSprite: Phaser.Physics.Arcade.Sprite;
 let ghostsGroup;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
-let testSpriteDirection = "South";
-let testSpritetakingDamage: Boolean = false;
+let knightSpriteDirection = "South";
+let knightSpritetakingDamage: Boolean = false;
 let cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
 let fireKey: Phaser.Input.Keyboard.Key;
 let firePressed = false;
@@ -72,7 +74,11 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON("testMap", testJSON);
     this.load.image("testTiles", testTilesPNG);
-    this.load.spritesheet("testSprite", testSpritePNG, {
+    this.load.spritesheet("knightSprite", knightSpritePNG, {
+      frameWidth: 64,
+      frameHeight: 64
+    });
+    this.load.spritesheet("skeletonSprite", skeletonSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
     });
@@ -169,8 +175,8 @@ export default class GameScene extends Phaser.Scene {
     mapLayerDoors.setCollisionByExclusion([-1], true, true);
 
     this.anims.create({
-      key: "idleNorth",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightIdleNorth",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 0,
         end: 0
       }),
@@ -178,8 +184,8 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "idleWest",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightIdleWest",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 9,
         end: 18
       }),
@@ -187,8 +193,8 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "idleSouth",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightIdleSouth",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 18,
         end: 18
       }),
@@ -196,8 +202,8 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "idleEast",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightIdleEast",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 27,
         end: 18
       }),
@@ -205,8 +211,8 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "walkNorth",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightWalkNorth",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 1,
         end: 8
       }),
@@ -214,8 +220,8 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "walkWest",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightWalkWest",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 10,
         end: 17
       }),
@@ -223,8 +229,8 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "walkSouth",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightWalkSouth",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 19,
         end: 26
       }),
@@ -232,10 +238,83 @@ export default class GameScene extends Phaser.Scene {
       repeat: -1
     });
     this.anims.create({
-      key: "walkEast",
-      frames: this.anims.generateFrameNumbers("testSprite", {
+      key: "knightWalkEast",
+      frames: this.anims.generateFrameNumbers("knightSprite", {
         start: 28,
         end: 35
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: "skeletonIdleNorth",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 0 * 13,
+        end: 6 + 0 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonIdleWest",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 1 * 13,
+        end: 6 + 1 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonIdleSouth",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 2 * 13,
+        end: 6 + 2 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonIdleEast",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 3 * 13,
+        end: 6 + 3 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonWalkNorth",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 8 * 13,
+        end: 8 + 8 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonWalkWest",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 9 * 13,
+        end: 8 + 9 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonWalkSouth",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 10 * 13,
+        end: 8 + 10 * 13
+      }),
+      frameRate: 15,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "skeletonWalkEast",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 11 * 13,
+        end: 8 + 11 * 13
       }),
       frameRate: 15,
       repeat: -1
@@ -248,24 +327,24 @@ export default class GameScene extends Phaser.Scene {
       map.heightInPixels * displayScale
     );
 
-    testSprite = this.physics.add
+    knightSprite = this.physics.add
       .sprite(
         SpawnPoints.SpawnPoint("Player 1").X,
         SpawnPoints.SpawnPoint("Player 1").Y,
-        "testSprite",
+        "knightSprite",
         2
       )
       .setScrollFactor(1, 1)
       .setDepth(7);
 
-    testSprite
+    knightSprite
       .setSize(20, 32)
       .setOffset(28, 32)
       .setScale(spriteScale, spriteScale)
       .setMaxVelocity(spriteVelocity)
       .setCollideWorldBounds(true)
-      .anims.play("idleSouth");
-    testSprite.name = "Player";
+      .anims.play("knightIdleSouth");
+    knightSprite.name = "Player";
 
     fireGroup = this.physics.add.group({
       immovable: false,
@@ -281,7 +360,13 @@ export default class GameScene extends Phaser.Scene {
         sword.destroy();
       }
     );
-    this.physics.add.collider(fireGroup, mapLayerDoors);
+    this.physics.add.collider(
+      fireGroup,
+      mapLayerDoors,
+      (sword: Phaser.Physics.Arcade.Sprite, door) => {
+        sword.destroy();
+      }
+    );
 
     this.anims.create({
       key: "ghostMoveSouth",
@@ -322,8 +407,8 @@ export default class GameScene extends Phaser.Scene {
 
     ghostsGroup = this.physics.add.group({
       immovable: false,
-      bounceX: 1,
-      bounceY: 1
+      bounceX: 0.0,
+      bounceY: 0.0
     });
 
     for (let i = 0; i < MAX_GHOSTS; i++) {
@@ -331,26 +416,30 @@ export default class GameScene extends Phaser.Scene {
         .sprite(
           Phaser.Math.Between(16, 128) * 32,
           Phaser.Math.Between(16, 128) * 32,
-          "ghostSprite",
+          "skeletonSprite", //"ghostSprite",
           0
         )
-        .setAlpha(0.7)
+        .setAlpha(1.0) //.setAlpha(0.7)
         .setScrollFactor(1, 1)
         .setDepth(5)
-        .setSize(16, 32)
-        .setOffset(14, 32)
-        .setScale(spriteScale * 2, spriteScale)
-        .setMaxVelocity(50);
+        .setSize(24, 32)
+        .setOffset(24, 32)
+        .setScale(spriteScale, spriteScale) //.setScale(spriteScale * 2, spriteScale)
+        .setMaxVelocity(100);
       ghostSprites[i].name = "Ghost";
-      ghostSprites[i].anims.play("ghostMoveSouth");
       ghostSprites[i].setCollideWorldBounds(true);
+      ghostSprites[i].play(
+        "skeletonWalkSouth",
+        false,
+        Phaser.Math.Between(0, 8)
+      );
       ghostsGroup.add(ghostSprites[i], false);
     }
 
-    this.physics.add.collider(testSprite, mapLayerWalls);
+    this.physics.add.collider(knightSprite, mapLayerWalls);
     this.physics.add.collider(ghostsGroup, mapLayerWalls);
     this.physics.add.collider(
-      testSprite,
+      knightSprite,
       mapLayerDoors,
       (o1, o2) => {
         if (o1.name === "Player") {
@@ -378,20 +467,20 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(ghostsGroup, mapLayerDoors);
     this.physics.add.collider(
-      testSprite,
+      knightSprite,
       ghostsGroup,
       (o1: Phaser.Physics.Arcade.Sprite, o2: Phaser.Physics.Arcade.Sprite) => {
-        if (testSpritetakingDamage === false) {
-          testSpritetakingDamage = true;
+        if (knightSpritetakingDamage === false) {
+          knightSpritetakingDamage = true;
           this.time.delayedCall(
             50,
             () => {
-              testSprite.tint = 0xff0000;
+              knightSprite.tint = 0xff0000;
               this.time.delayedCall(
                 50,
                 () => {
-                  testSpritetakingDamage = false;
-                  testSprite.tint = 0xffffff;
+                  knightSpritetakingDamage = false;
+                  knightSprite.tint = 0xffffff;
                 },
                 null,
                 this
@@ -417,7 +506,7 @@ export default class GameScene extends Phaser.Scene {
       map.widthInPixels * displayScale,
       map.heightInPixels * displayScale
     );
-    this.cameras.main.startFollow(testSprite, false, 0.8, 0.8, 0.5, 0.5);
+    this.cameras.main.startFollow(knightSprite, false, 0.8, 0.8, 0.5, 0.5);
   }
 
   update() {
@@ -434,13 +523,13 @@ export default class GameScene extends Phaser.Scene {
       let touchY = pointer.y;
       let worldPoint = this.cameras.main.getWorldPoint(touchX, touchY);
 
-      if (worldPoint.x >> 4 < testSprite.x >> 4) {
+      if (worldPoint.x >> 4 < knightSprite.x >> 4) {
         moveLeft = true;
         moveRight = false;
         if (!fireClicked) {
           fireDirection |= 4;
         }
-      } else if (worldPoint.x >> 4 > testSprite.x >> 4) {
+      } else if (worldPoint.x >> 4 > knightSprite.x >> 4) {
         moveLeft = false;
         moveRight = true;
         if (!fireClicked) {
@@ -448,13 +537,13 @@ export default class GameScene extends Phaser.Scene {
         }
       }
 
-      if (worldPoint.y >> 4 < testSprite.y >> 4) {
+      if (worldPoint.y >> 4 < knightSprite.y >> 4) {
         moveUp = true;
         moveDown = false;
         if (!fireClicked) {
           fireDirection |= 8;
         }
-      } else if (worldPoint.y >> 4 > testSprite.y >> 4) {
+      } else if (worldPoint.y >> 4 > knightSprite.y >> 4) {
         moveUp = false;
         moveDown = true;
         if (!fireClicked) {
@@ -466,7 +555,9 @@ export default class GameScene extends Phaser.Scene {
       fireClicked = false;
     }
 
-    testSprite.setDepth(100 + testSprite.x + testSprite.y * map.widthInPixels);
+    knightSprite.setDepth(
+      100 + knightSprite.x + knightSprite.y * map.widthInPixels
+    );
 
     if (fireKey.isUp) {
       firePressed = false;
@@ -474,61 +565,67 @@ export default class GameScene extends Phaser.Scene {
 
     if (cursorKeys.right.isDown || moveRight) {
       if (fireKey.isUp) {
-        testSprite.setVelocityX(spriteVelocity);
-        if (testSprite.anims.currentAnim.key != "walkEast" && !moving) {
-          testSprite.anims.play("walkEast");
+        knightSprite.setVelocityX(spriteVelocity);
+        if (knightSprite.anims.currentAnim.key != "knightWalkEast" && !moving) {
+          knightSprite.anims.play("knightWalkEast");
         }
-        testSpriteDirection = "East";
+        knightSpriteDirection = "East";
         moving = true;
       }
       if (fireKey.isDown && !firePressed) {
-        testSprite.setVelocityX(0);
+        knightSprite.setVelocityX(0);
         fireDirection |= 1;
       }
     } else if (cursorKeys.left.isDown || moveLeft) {
       if (fireKey.isUp) {
-        testSprite.setVelocityX(-spriteVelocity);
-        if (testSprite.anims.currentAnim.key != "walkWest" && !moving) {
-          testSprite.anims.play("walkWest");
+        knightSprite.setVelocityX(-spriteVelocity);
+        if (knightSprite.anims.currentAnim.key != "knightWalkWest" && !moving) {
+          knightSprite.anims.play("knightWalkWest");
         }
-        testSpriteDirection = "West";
+        knightSpriteDirection = "West";
         moving = true;
       }
       if (fireKey.isDown && !firePressed) {
-        testSprite.setVelocityX(0);
+        knightSprite.setVelocityX(0);
         fireDirection |= 4;
       }
     } else {
-      testSprite.setVelocityX(0);
+      knightSprite.setVelocityX(0);
       moving = false;
     }
 
     if (cursorKeys.up.isDown || moveUp) {
-      testSprite.setVelocityY(-spriteVelocity);
+      knightSprite.setVelocityY(-spriteVelocity);
       if (fireKey.isDown && !firePressed) {
-        testSprite.setVelocityY(0);
+        knightSprite.setVelocityY(0);
         fireDirection |= 8;
         firePressed = true;
       }
-      if (testSprite.anims.currentAnim.key != "walkNorth" && moving === false) {
-        testSprite.anims.play("walkNorth");
+      if (
+        knightSprite.anims.currentAnim.key != "knightWalkNorth" &&
+        moving === false
+      ) {
+        knightSprite.anims.play("knightWalkNorth");
       }
-      testSpriteDirection = "North";
+      knightSpriteDirection = "North";
       moving = true;
     } else if (cursorKeys.down.isDown || moveDown) {
-      testSprite.setVelocityY(spriteVelocity);
+      knightSprite.setVelocityY(spriteVelocity);
       if (fireKey.isDown && !firePressed) {
-        testSprite.setVelocityY(0);
+        knightSprite.setVelocityY(0);
         fireDirection |= 2;
         firePressed = true;
       }
-      if (testSprite.anims.currentAnim.key != "walkSouth" && moving === false) {
-        testSprite.anims.play("walkSouth");
+      if (
+        knightSprite.anims.currentAnim.key != "knightWalkSouth" &&
+        moving === false
+      ) {
+        knightSprite.anims.play("knightWalkSouth");
       }
-      testSpriteDirection = "South";
+      knightSpriteDirection = "South";
       moving = true;
     } else {
-      testSprite.setVelocityY(0);
+      knightSprite.setVelocityY(0);
     }
 
     if (fireKey.isDown) {
@@ -536,17 +633,17 @@ export default class GameScene extends Phaser.Scene {
     }
 
     if (moving === true) {
-      testSprite.anims.msPerFrame = 75;
+      knightSprite.anims.msPerFrame = 75;
     } else {
-      testSprite.anims.msPerFrame = 150;
+      knightSprite.anims.msPerFrame = 150;
     }
 
     if (
-      Math.abs(testSprite.body.velocity.x) +
-        Math.abs(testSprite.body.velocity.y) ===
+      Math.abs(knightSprite.body.velocity.x) +
+        Math.abs(knightSprite.body.velocity.y) ===
       0
     ) {
-      testSprite.anims.play("idle" + testSpriteDirection);
+      knightSprite.anims.play("knightIdle" + knightSpriteDirection);
     }
 
     if (fireDirection) {
@@ -572,8 +669,8 @@ export default class GameScene extends Phaser.Scene {
       }
 
       let newSword = this.physics.add.sprite(
-        testSprite.x,
-        testSprite.y,
+        knightSprite.x,
+        knightSprite.y,
         "swordSprite",
         fireFrame
       );
@@ -581,6 +678,7 @@ export default class GameScene extends Phaser.Scene {
 
       newSword
         .setDepth(6)
+        .setScale(1, 1)
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
@@ -596,8 +694,8 @@ export default class GameScene extends Phaser.Scene {
         ghostSprites[i].setDepth(
           100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
         );
-        ghostXDiff = ghostSprites[i].x - testSprite.x;
-        ghostYDiff = ghostSprites[i].y - testSprite.y;
+        ghostXDiff = ghostSprites[i].x - knightSprite.x;
+        ghostYDiff = ghostSprites[i].y - knightSprite.y;
 
         if (ghostXDiff < 16) {
           ghostSprites[i].setDamping(false);
@@ -624,22 +722,38 @@ export default class GameScene extends Phaser.Scene {
 
         if (Math.abs(ghostXDiff) > Math.abs(ghostYDiff)) {
           if (ghostXDiff < 0) {
-            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveEast") {
-              ghostSprites[i].anims.play("ghostMoveEast");
+            if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkEast") {
+              ghostSprites[i].anims.play(
+                "skeletonWalkEast",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           } else {
-            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveWest") {
-              ghostSprites[i].anims.play("ghostMoveWest");
+            if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkWest") {
+              ghostSprites[i].anims.play(
+                "skeletonWalkWest",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           }
         } else {
           if (ghostYDiff < 0) {
-            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveSouth") {
-              ghostSprites[i].anims.play("ghostMoveSouth");
+            if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkSouth") {
+              ghostSprites[i].anims.play(
+                "skeletonWalkSouth",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           } else {
-            if (ghostSprites[i].anims.currentAnim.key != "ghostMoveNorth") {
-              ghostSprites[i].anims.play("ghostMoveNorth");
+            if (ghostSprites[i].anims.currentAnim.key != "skeletonWalkNorth") {
+              ghostSprites[i].anims.play(
+                "skeletonWalkNorth",
+                false,
+                Phaser.Math.Between(0, 8)
+              );
             }
           }
         }
