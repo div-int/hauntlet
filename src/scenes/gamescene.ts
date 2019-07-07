@@ -3,7 +3,7 @@ import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
-let testJSON = require("../assets/maps/tiled/test.json");
+let testJSON = require("../assets/maps/tiled/level_1.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
@@ -26,8 +26,8 @@ let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerRoofWalls: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
-let displayScale = 2;
-let spriteScale = 1;
+let displayScale = 4;
+let spriteScale = 2;
 let spriteVelocity = 200;
 let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
@@ -140,8 +140,8 @@ export default class GameScene extends Phaser.Scene {
       .setDepth(100000001);
     mapLayerRoofWalls = map
       .createStaticLayer("RoofWalls", mapTiles)
-      .setX(32)
-      .setY(32)
+      .setX(16 * displayScale)
+      .setY(16 * displayScale)
       .setScale(displayScale, displayScale)
       .setDepth(100000002);
 
@@ -670,7 +670,7 @@ export default class GameScene extends Phaser.Scene {
 
       let newSword = this.physics.add.sprite(
         knightSprite.x,
-        knightSprite.y,
+        knightSprite.y + 8 * spriteScale,
         "swordSprite",
         fireFrame
       );
@@ -678,7 +678,7 @@ export default class GameScene extends Phaser.Scene {
 
       newSword
         .setDepth(6)
-        .setScale(1, 1)
+        .setScale(spriteScale, spriteScale)
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
