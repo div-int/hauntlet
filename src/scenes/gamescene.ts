@@ -5,7 +5,7 @@ import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 let testJSON = require("../assets/maps/tiled/level_1.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
-let treasureTilesPNG = require("../assets/items/treasure.png");
+let treasureTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
