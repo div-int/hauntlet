@@ -128,7 +128,7 @@ export default class GameScene extends Phaser.Scene {
       .setScale(displayScale, displayScale)
       .setDepth(10);
     mapLayerDoorShadows = map
-      .createDynamicLayer("DoorShadows", mapTiles)
+      .createDynamicLayer("DoorShadows", mapTiles,0,0)
       .setScale(displayScale, displayScale)
       .setDepth(4);
 
