@@ -5,6 +5,7 @@ import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 let testJSON = require("../assets/maps/tiled/level_1.json");
 let testTilesPNG = require("../assets/images/tiles/placeholder.png");
+let treasureTilesPNG = require("../assets/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
@@ -13,19 +14,20 @@ let swordSpritePNG = require("../assets/images/weapons/sword.png");
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 256;
+const MAX_GHOSTS: integer = 128;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
+let treasureTiles: Phaser.Tilemaps.Tileset;
 let mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerItems: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let displayScale = 2;
-let spriteScale = 1;
+let spriteScale = 2;
 let spriteVelocity = 200;
 let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
@@ -73,6 +75,7 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     this.load.tilemapTiledJSON("testMap", testJSON);
     this.load.image("testTiles", testTilesPNG);
+    this.load.image("treasureTiles", treasureTilesPNG);
     this.load.spritesheet("knightSprite", knightSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
@@ -103,6 +106,7 @@ export default class GameScene extends Phaser.Scene {
 
     map = this.add.tilemap("testMap");
     mapTiles = map.addTilesetImage("test", "testTiles");
+    treasureTiles = map.addTilesetImage("treasure", "treasureTiles");
     mapLayerFloor = map
       .createStaticLayer("Floor", mapTiles)
       .setScale(displayScale, displayScale)
@@ -120,7 +124,7 @@ export default class GameScene extends Phaser.Scene {
       .setScale(displayScale, displayScale)
       .setDepth(4);
     mapLayerItems = map
-      .createStaticLayer("Items", mapTiles)
+      .createDynamicLayer("Items", treasureTiles)
       .setScale(displayScale, displayScale)
       .setDepth(5);
     mapLayerDoors = map
@@ -128,7 +132,7 @@ export default class GameScene extends Phaser.Scene {
       .setScale(displayScale, displayScale)
       .setDepth(10);
     mapLayerDoorShadows = map
-      .createDynamicLayer("DoorShadows", mapTiles,0,0)
+      .createDynamicLayer("DoorShadows", mapTiles, 0, 0)
       .setScale(displayScale, displayScale)
       .setDepth(4);
 
@@ -160,6 +164,7 @@ export default class GameScene extends Phaser.Scene {
 
     mapLayerWalls.setCollisionByExclusion([-1], true, true);
     mapLayerDoors.setCollisionByExclusion([-1], true, true);
+    //mapLayerItems.setCollisionByExclusion([-1], true, true);
 
     this.anims.create({
       key: "knightIdleNorth",
@@ -428,9 +433,8 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(
       knightSprite,
       mapLayerDoors,
-      (o1, o2) => {
+      (o1: any, o2: any) => {
         if (o1.name === "Player") {
-          // @ts-ignore
           removeDoor(findDoorAt(o2.x, o2.y));
           // @ts-ignore
           //console.log(o2.index, o2.x, o2.y);
@@ -439,6 +443,18 @@ export default class GameScene extends Phaser.Scene {
       null,
       this
     );
+
+    this.physics.add.overlap(
+      knightSprite,
+      mapLayerItems,
+      (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
+        if (item.index != -1) {
+          //console.log(knight, item);
+          mapLayerItems.removeTileAt(item.x, item.y);
+        }
+      }
+    );
+
     this.physics.add.collider(
       ghostsGroup,
       fireGroup,
