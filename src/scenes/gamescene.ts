@@ -23,9 +23,7 @@ let mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
-let mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerRoofWalls: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let displayScale = 4;
 let spriteScale = 2;
 let spriteVelocity = 200;
@@ -61,6 +59,7 @@ function removeDoor(doorId) {
   console.log(`removeDoor(${doorId})`);
   doors[doorId].forEach(location => {
     mapLayerDoors.removeTileAt(location.x, location.y, false, true);
+    mapLayerDoorShadows.removeTileAt(location.x, location.y, false, true);
   });
 }
 
@@ -128,22 +127,10 @@ export default class GameScene extends Phaser.Scene {
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(10);
-    mapLayerRoof = map
-      .createStaticLayer("Roof", mapTiles)
+    mapLayerDoorShadows = map
+      .createDynamicLayer("DoorShadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(100000000);
-    mapLayerRoofShadows = map
-      .createStaticLayer("RoofShadows", mapTiles)
-      .setX(16 * displayScale)
-      .setY(16 * displayScale)
-      .setScale(displayScale, displayScale)
-      .setDepth(100000001);
-    mapLayerRoofWalls = map
-      .createStaticLayer("RoofWalls", mapTiles)
-      .setX(16 * displayScale)
-      .setY(16 * displayScale)
-      .setScale(displayScale, displayScale)
-      .setDepth(100000002);
+      .setDepth(4);
 
     const objects = map.findObject("Doors", o => {
       // @ts-ignore
