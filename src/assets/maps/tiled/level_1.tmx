@@ -5,19 +5,24 @@
  </tileset>
  <tileset firstgid="65" name="items" tilewidth="32" tileheight="32" tilecount="64" columns="8">
   <image source="../../images/items/treasure.png" width="256" height="256"/>
-  <tile id="0">
+  <tile id="0" type="treasure">
    <properties>
-    <property name="name" value="coins"/>
+    <property name="name" value="Gold Coins"/>
+    <property name="type" value="treasure"/>
+    <property name="value" type="int" value="100"/>
    </properties>
   </tile>
-  <tile id="1">
+  <tile id="1" type="key">
    <properties>
-    <property name="name" value="key"/>
+    <property name="name" value="Gold Key"/>
+    <property name="type" value="key"/>
    </properties>
   </tile>
-  <tile id="2">
+  <tile id="2" type="food">
    <properties>
-    <property name="name" value="food"/>
+    <property name="name" value="Plate of Food"/>
+    <property name="type" value="food"/>
+    <property name="value" type="int" value="50"/>
    </properties>
   </tile>
  </tileset>
@@ -157,7 +162,7 @@
 9,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,10
 </data>
  </layer>
- <layer id="8" name="Exits" width="64" height="64">
+ <layer id="8" name="Exits" width="64" height="64" visible="0">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

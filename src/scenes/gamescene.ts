@@ -43,6 +43,8 @@ let fireClicked = false;
 let fireGroup;
 let doors = [];
 let keys: number = 0;
+let score: number = 0;
+let health: number = 800;
 
 function findDoorAt(x, y) {
   let foundDoorId: string;
@@ -452,9 +454,28 @@ export default class GameScene extends Phaser.Scene {
       (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
         if (item.index != -1) {
           if (knight.x >> 6 === item.x && knight.y >> 6 === item.y - 1) {
-            // console.log(`Collected item ${item.properties.name}`);
-            if (item.properties.name === "key") keys++;
-            mapLayerItems.removeTileAt(item.x, item.y);
+            // console.log(
+            //   `Collected item ${item.properties.name}: ${item.properties.type}`,
+            //   item
+            // );
+            let consume: boolean = false;
+            if (item.properties.type === "key") {
+              keys++;
+              consume = true;
+            }
+            if (item.properties.type === "treasure") {
+              score += item.properties.value;
+              consume = true;
+            }
+            if (item.properties.type === "food") {
+              health += item.properties.value;
+              consume = true;
+            }
+
+            if (consume) {
+              mapLayerItems.removeTileAt(item.x, item.y);
+              console.log(keys, score, health);
+            }
           }
         }
       }
@@ -480,6 +501,7 @@ export default class GameScene extends Phaser.Scene {
       (o1: Phaser.Physics.Arcade.Sprite, o2: Phaser.Physics.Arcade.Sprite) => {
         if (knightSpritetakingDamage === false) {
           knightSpritetakingDamage = true;
+          health--;
           this.time.delayedCall(
             50,
             () => {

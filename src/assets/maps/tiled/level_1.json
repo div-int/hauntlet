@@ -32,7 +32,7 @@
          "name":"Exits",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":64,
          "x":0,
          "y":0
@@ -519,8 +519,19 @@
                         {
                          "name":"name",
                          "type":"string",
-                         "value":"coins"
-                        }]
+                         "value":"Gold Coins"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"treasure"
+                        }, 
+                        {
+                         "name":"value",
+                         "type":"int",
+                         "value":100
+                        }],
+                 "type":"treasure"
                 }, 
                 {
                  "id":1,
@@ -528,8 +539,14 @@
                         {
                          "name":"name",
                          "type":"string",
+                         "value":"Gold Key"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
                          "value":"key"
-                        }]
+                        }],
+                 "type":"key"
                 }, 
                 {
                  "id":2,
@@ -537,8 +554,19 @@
                         {
                          "name":"name",
                          "type":"string",
+                         "value":"Plate of Food"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
                          "value":"food"
-                        }]
+                        }, 
+                        {
+                         "name":"value",
+                         "type":"int",
+                         "value":50
+                        }],
+                 "type":"food"
                 }],
          "tilewidth":32
         }],
