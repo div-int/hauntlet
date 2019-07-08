@@ -3,9 +3,9 @@ import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
-let testJSON = require("../assets/maps/tiled/level_1.json");
-let testTilesPNG = require("../assets/images/tiles/placeholder.png");
-let treasureTilesPNG = require("../assets/images/items/treasure.png");
+let levelJSON = require("../assets/maps/tiled/level_1.json");
+let levelTilesPNG = require("../assets/images/tiles/placeholder.png");
+let itemTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
@@ -18,7 +18,7 @@ const MAX_GHOSTS: integer = 128;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
-let treasureTiles: Phaser.Tilemaps.Tileset;
+let itemTiles: Phaser.Tilemaps.Tileset;
 let mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
@@ -42,6 +42,7 @@ let firePressed = false;
 let fireClicked = false;
 let fireGroup;
 let doors = [];
+let keys: number = 0;
 
 function findDoorAt(x, y) {
   let foundDoorId: string;
@@ -58,7 +59,7 @@ function findDoorAt(x, y) {
 }
 
 function removeDoor(doorId) {
-  console.log(`removeDoor(${doorId})`);
+  // console.log(`removeDoor(${doorId})`);
   doors[doorId].forEach(location => {
     mapLayerDoors.removeTileAt(location.x, location.y, false, true);
     mapLayerDoorShadows.removeTileAt(location.x, location.y, false, true);
@@ -73,9 +74,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.tilemapTiledJSON("testMap", testJSON);
-    this.load.image("testTiles", testTilesPNG);
-    this.load.image("treasureTiles", treasureTilesPNG);
+    this.load.tilemapTiledJSON("levelMap", levelJSON);
+    this.load.image("levelTiles", levelTilesPNG);
+    this.load.image("itemTiles", itemTilesPNG);
     this.load.spritesheet("knightSprite", knightSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
@@ -96,17 +97,17 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.add
-      .text(4, 4, `Version : ${Version}`, { fontSize: "16px", fill: "#000" })
+      .text(9, 9, `Version : ${Version}`, { fontSize: "32px", fill: "#000" })
       .setDepth(20000000)
       .setScrollFactor(0, 0);
     this.add
-      .text(3, 3, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
+      .text(8, 8, `Version : ${Version}`, { fontSize: "32px", fill: "#fff" })
       .setDepth(20000001)
       .setScrollFactor(0, 0);
 
-    map = this.add.tilemap("testMap");
-    mapTiles = map.addTilesetImage("test", "testTiles");
-    treasureTiles = map.addTilesetImage("treasure", "treasureTiles");
+    map = this.add.tilemap("levelMap");
+    mapTiles = map.addTilesetImage("level", "levelTiles");
+    itemTiles = map.addTilesetImage("items", "itemTiles");
     mapLayerFloor = map
       .createStaticLayer("Floor", mapTiles)
       .setScale(displayScale, displayScale)
@@ -124,7 +125,7 @@ export default class GameScene extends Phaser.Scene {
       .setScale(displayScale, displayScale)
       .setDepth(4);
     mapLayerItems = map
-      .createDynamicLayer("Items", treasureTiles)
+      .createDynamicLayer("Items", itemTiles)
       .setScale(displayScale, displayScale)
       .setDepth(5);
     mapLayerDoors = map
@@ -138,7 +139,7 @@ export default class GameScene extends Phaser.Scene {
 
     const objects = map.findObject("Doors", o => {
       // @ts-ignore
-      console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
+      // console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
       // @ts-ignore
       mapLayerDoors.putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
       // @ts-ignore
@@ -434,8 +435,9 @@ export default class GameScene extends Phaser.Scene {
       knightSprite,
       mapLayerDoors,
       (o1: any, o2: any) => {
-        if (o1.name === "Player") {
+        if (o1.name === "Player" && keys > 0) {
           removeDoor(findDoorAt(o2.x, o2.y));
+          keys--;
           // @ts-ignore
           //console.log(o2.index, o2.x, o2.y);
         }
@@ -449,8 +451,11 @@ export default class GameScene extends Phaser.Scene {
       mapLayerItems,
       (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
         if (item.index != -1) {
-          //console.log(knight, item);
-          mapLayerItems.removeTileAt(item.x, item.y);
+          if (knight.x >> 6 === item.x && knight.y >> 6 === item.y - 1) {
+            // console.log(`Collected item ${item.properties.name}`);
+            if (item.properties.name === "key") keys++;
+            mapLayerItems.removeTileAt(item.x, item.y);
+          }
         }
       }
     );
@@ -492,7 +497,7 @@ export default class GameScene extends Phaser.Scene {
             null,
             this
           );
-          console.log("Ghost and player collided");
+          // console.log("Ghost and player collided");
         }
       },
       null,
