@@ -45,6 +45,8 @@ let doors = [];
 let keys: number = 0;
 let score: number = 0;
 let health: number = 800;
+let statusText: Phaser.GameObjects.Text;
+let statusTextShadow: Phaser.GameObjects.Text;
 
 function findDoorAt(x, y) {
   let foundDoorId: string;
@@ -99,11 +101,26 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.add
-      .text(9, 9, `Version : ${Version}`, { fontSize: "32px", fill: "#000" })
+      .text(9, 9, `Version : ${Version}`, { fontSize: "16px", fill: "#000" })
       .setDepth(20000000)
       .setScrollFactor(0, 0);
     this.add
-      .text(8, 8, `Version : ${Version}`, { fontSize: "32px", fill: "#fff" })
+      .text(8, 8, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
+      .setDepth(20000001)
+      .setScrollFactor(0, 0);
+
+    statusTextShadow = this.add
+      .text(9, 33, `Keys : ${keys} Score : ${score} Health : ${health}`, {
+        fontSize: "16px",
+        fill: "#000"
+      })
+      .setDepth(20000000)
+      .setScrollFactor(0, 0);
+    statusText = this.add
+      .text(8, 32, `Keys : ${keys} Score : ${score} Health : ${health}`, {
+        fontSize: "16px",
+        fill: "#ffff00"
+      })
       .setDepth(20000001)
       .setScrollFactor(0, 0);
 
@@ -474,7 +491,7 @@ export default class GameScene extends Phaser.Scene {
 
             if (consume) {
               mapLayerItems.removeTileAt(item.x, item.y);
-              console.log(keys, score, health);
+              //console.log(keys, score, health);
             }
           }
         }
@@ -491,6 +508,7 @@ export default class GameScene extends Phaser.Scene {
         //console.log(ghost, sword);
         sword.destroy();
         ghost.destroy();
+        score += 10;
       }
     );
 
@@ -547,6 +565,11 @@ export default class GameScene extends Phaser.Scene {
     let moveDown = false;
     let fireDirection = 0;
     let moving = false;
+
+    statusText.setText(`Keys : ${keys} Score : ${score} Health : ${health}`);
+    statusTextShadow.setText(
+      `Keys : ${keys} Score : ${score} Health : ${health}`
+    );
 
     if (pointer.isDown) {
       let touchX = pointer.x;
