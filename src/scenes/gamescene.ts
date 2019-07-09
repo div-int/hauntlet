@@ -10,6 +10,8 @@ let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
 let swordSpritePNG = require("../assets/images/weapons/sword.png");
+let pressStart2PPNG = require("../assets/images/fonts/press-start-2p_0.png");
+let pressStart2PXML = require("../assets/images/fonts/press-start-2p.xml");
 
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
@@ -45,8 +47,7 @@ let doors = [];
 let keys: number = 0;
 let score: number = 0;
 let health: number = 800;
-let statusText: Phaser.GameObjects.Text;
-let statusTextShadow: Phaser.GameObjects.Text;
+let statusText: Phaser.GameObjects.BitmapText;
 
 function findDoorAt(x, y) {
   let foundDoorId: string;
@@ -78,6 +79,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
     this.load.tilemapTiledJSON("levelMap", levelJSON);
     this.load.image("levelTiles", levelTilesPNG);
     this.load.image("itemTiles", itemTilesPNG);
@@ -109,20 +111,18 @@ export default class GameScene extends Phaser.Scene {
       .setDepth(20000001)
       .setScrollFactor(0, 0);
 
-    statusTextShadow = this.add
-      .text(9, 33, `Keys : ${keys} Score : ${score} Health : ${health}`, {
-        fontSize: "16px",
-        fill: "#000"
-      })
-      .setDepth(20000000)
-      .setScrollFactor(0, 0);
     statusText = this.add
-      .text(8, 32, `Keys : ${keys} Score : ${score} Health : ${health}`, {
-        fontSize: "16px",
-        fill: "#ffff00"
-      })
+      .bitmapText(
+        32,
+        32,
+        "press-start-2p",
+        "Keys : 0 - Score : 0 : Health : 0",
+        8,
+        0
+      )
       .setDepth(20000001)
-      .setScrollFactor(0, 0);
+      .setScrollFactor(0, 0)
+      .setScale(2, 2);
 
     map = this.add.tilemap("levelMap");
     mapTiles = map.addTilesetImage("level", "levelTiles");
@@ -566,10 +566,10 @@ export default class GameScene extends Phaser.Scene {
     let fireDirection = 0;
     let moving = false;
 
-    statusText.setText(`Keys : ${keys} Score : ${score} Health : ${health}`);
-    statusTextShadow.setText(
-      `Keys : ${keys} Score : ${score} Health : ${health}`
+    statusText.setText(
+      `Keys : ${keys} - Score : ${score} : Health : ${health}`
     );
+    statusText.setTint(0xff0000, 0xff0000, 0xffff00, 0xffff00);
 
     if (pointer.isDown) {
       let touchX = pointer.x;
