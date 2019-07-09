@@ -116,7 +116,7 @@ export default class GameScene extends Phaser.Scene {
         32,
         32,
         "press-start-2p",
-        "Keys : 0 - Score : 0 : Health : 0",
+        "Keys : \x01  x 0 - Score : 0 : Health : \x02  0",
         8,
         0
       )
@@ -567,7 +567,7 @@ export default class GameScene extends Phaser.Scene {
     let moving = false;
 
     statusText.setText(
-      `Keys : ${keys} - Score : ${score} : Health : ${health}`
+      `Keys : \x01  x ${keys} - Score : ${score} : Health : \x02  ${health}`
     );
     statusText.setTint(0xff0000, 0xff0000, 0xffff00, 0xffff00);
 
