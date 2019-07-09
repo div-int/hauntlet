@@ -103,18 +103,20 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.add
-      .text(9, 9, `Version : ${Version}`, { fontSize: "16px", fill: "#000" })
-      .setDepth(20000000)
-      .setScrollFactor(0, 0);
-    this.add
-      .text(8, 8, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
+      .bitmapText(12, 12, "press-start-2p", `Version : ${Version}`, 8, 0)
       .setDepth(20000001)
-      .setScrollFactor(0, 0);
+      .setScrollFactor(0, 0)
+      .setTint(0x00ff00, 0x00ff00, 0x00ffff, 0x00ffff)
+      .setScale(2, 2);
+    // this.add
+    //   .text(8, 8, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
+    //   .setDepth(20000001)
+    //   .setScrollFactor(0, 0);
 
     statusText = this.add
       .bitmapText(
-        32,
-        32,
+        12,
+        44,
         "press-start-2p",
         "Keys : \x01  x 0 - Score : 0 : Health : \x02  0",
         8,
