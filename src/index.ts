@@ -2,13 +2,12 @@ import "phaser";
 import config from "./config/config";
 import GameScene from "./scenes/gamescene";
 class HauntletGame extends Phaser.Game {
+  version: string;
 
-  version:string;
-
-  constructor(config: Phaser.Types.Core.GameConfig) {
+  constructor(config: Phaser.Types.Core.GameConfig, startlevel: string) {
     super(config);
 
-    this.scene.add("GameScene", GameScene);
+    this.scene.add("GameScene", new GameScene(startlevel));
     this.scene.start("GameScene");
   }
 
@@ -20,5 +19,5 @@ class HauntletGame extends Phaser.Game {
 window.onload = function() {
   //window.game = new HauntletGame();
 
-  var hauntletGame = new HauntletGame(config);
+  var hauntletGame = new HauntletGame(config, "level_2");
 };

@@ -3,7 +3,7 @@ import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
-let levelJSON = require("../assets/maps/tiled/level_1.json");
+let levelJSON: any;
 let levelTilesPNG = require("../assets/images/tiles/placeholder.png");
 let itemTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
@@ -72,13 +72,17 @@ function removeDoor(doorId) {
 }
 
 export default class GameScene extends Phaser.Scene {
-  constructor() {
-    super("GameScene");
+  private _level: string;
 
-    console.log(`GameScene::constructor() : ${Version}`);
+  constructor(level: string) {
+    super("GameScene");
+    console.log(`GameScene::constructor(${level}) : ${Version}`);
+
+    this._level = level;
   }
 
   preload() {
+    levelJSON = require(`../assets/maps/tiled/${this._level}.json`);
     this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
     this.load.tilemapTiledJSON("levelMap", levelJSON);
     this.load.image("levelTiles", levelTilesPNG);
