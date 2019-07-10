@@ -4,7 +4,7 @@ import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 let levelJSON: any;
-let levelTilesPNG = require("../assets/images/tiles/placeholder.png");
+let levelTilesPNG = require("../assets/images/tiles/placeholder.extruded.png");
 let itemTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
