@@ -100,8 +100,8 @@ export default class GameScene extends Phaser.Scene {
       frameHeight: 64
     });
     this.load.spritesheet("swordSprite", swordSpritePNG, {
-      frameWidth: 18,
-      frameHeight: 18
+      frameWidth: 20,
+      frameHeight: 20
     });
   }
 
@@ -374,7 +374,15 @@ export default class GameScene extends Phaser.Scene {
       fireGroup,
       mapLayerWalls,
       (sword: Phaser.Physics.Arcade.Sprite, tile: any) => {
-        sword.destroy();
+        sword.setFrame(4);
+        this.time.delayedCall(
+          120,
+          (swordHit: Phaser.Physics.Arcade.Sprite) => {
+            swordHit.destroy();
+          },
+          [sword],
+          this
+        );
 
         if (tile.properties.destructable) {
           mapLayerWalls.removeTileAt(tile.x, tile.y);
@@ -443,7 +451,15 @@ export default class GameScene extends Phaser.Scene {
       fireGroup,
       mapLayerDoors,
       (sword: Phaser.Physics.Arcade.Sprite, door) => {
-        sword.destroy();
+        sword.setFrame(4);
+        this.time.delayedCall(
+          120,
+          (swordHit: Phaser.Physics.Arcade.Sprite) => {
+            swordHit.destroy();
+          },
+          [sword],
+          this
+        );
       }
     );
 
@@ -573,7 +589,15 @@ export default class GameScene extends Phaser.Scene {
         sword: Phaser.Physics.Arcade.Sprite
       ) => {
         //console.log(ghost, sword);
-        sword.destroy();
+        sword.setFrame(4);
+        this.time.delayedCall(
+          120,
+          (swordHit: Phaser.Physics.Arcade.Sprite) => {
+            swordHit.destroy();
+          },
+          [sword],
+          this
+        );
         ghost.destroy();
         score += 10;
       }
@@ -788,12 +812,16 @@ export default class GameScene extends Phaser.Scene {
         fireFrame -= 3;
       }
 
-      let newSword = this.physics.add.sprite(
-        knightSprite.x,
-        knightSprite.y + 8 * spriteScale,
-        "swordSprite",
-        fireFrame
-      );
+      let newSword = this.physics.add
+        .sprite(
+          knightSprite.x,
+          knightSprite.y + 8 * spriteScale,
+          "swordSprite",
+          fireFrame
+        )
+        .setDepth(10000001)
+        .setSize(10, 10)
+        .setOffset(5, 5);
       fireGroup.add(newSword, false);
 
       newSword
