@@ -337,6 +337,15 @@ export default class GameScene extends Phaser.Scene {
       frameRate: 15,
       repeat: -1
     });
+    this.anims.create({
+      key: "skeletonDie",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 20 * 13,
+        end: 5 + 20 * 13
+      }),
+      frameRate: 15,
+      repeat: 0
+    });
 
     this.physics.world.setBounds(
       0,
@@ -598,7 +607,18 @@ export default class GameScene extends Phaser.Scene {
           [sword],
           this
         );
-        ghost.destroy();
+        ghost.setVelocity(0, 0);
+        ghost.setAcceleration(0, 0);
+        ghostsGroup.remove(ghost);
+        ghost.play("skeletonDie", true, 0);
+        this.time.delayedCall(
+          1000,
+          ghostDead => {
+            ghostDead.destroy();
+          },
+          [ghost],
+          this
+        );
         score += 10;
       }
     );
@@ -838,7 +858,10 @@ export default class GameScene extends Phaser.Scene {
 
     for (let i = 0; i < MAX_GHOSTS; i++) {
       //console.log(ghostSprites[i]);
-      if (ghostSprites[i].active) {
+      if (
+        ghostSprites[i].active &&
+        ghostSprites[i].anims.currentAnim.key != "skeletonDie"
+      ) {
         ghostSprites[i].setDepth(
           100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
         );
