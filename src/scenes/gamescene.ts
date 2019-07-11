@@ -374,7 +374,6 @@ export default class GameScene extends Phaser.Scene {
       fireGroup,
       mapLayerWalls,
       (sword: Phaser.Physics.Arcade.Sprite, tile: any) => {
-        console.log(sword, tile);
         sword.destroy();
 
         if (tile.properties.destructable) {
