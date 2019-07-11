@@ -25,7 +25,7 @@ let mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerItems: Phaser.Tilemaps.DynamicTilemapLayer;
-let mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let displayScale = 2;
@@ -146,7 +146,7 @@ export default class GameScene extends Phaser.Scene {
       .setScale(displayScale, displayScale)
       .setDepth(3);
     mapLayerShadows = map
-      .createStaticLayer("Shadows", mapTiles)
+      .createDynamicLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
       .setDepth(4);
     mapLayerItems = map
@@ -373,9 +373,71 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(
       fireGroup,
       mapLayerWalls,
-      (sword: Phaser.Physics.Arcade.Sprite, tile) => {
-        //console.log(sword, tile);
+      (sword: Phaser.Physics.Arcade.Sprite, tile: any) => {
+        console.log(sword, tile);
         sword.destroy();
+
+        if (tile.properties.destructable) {
+          mapLayerWalls.removeTileAt(tile.x, tile.y);
+          mapLayerWalls
+            .putTileAt(
+              tile.properties.alsoIndexMinus + 1,
+              tile.x - tile.properties.alsoX,
+              tile.y - tile.properties.alsoY,
+              true
+            )
+            .setCollision(true, true, true, true, true);
+          mapLayerWalls
+            .putTileAt(
+              tile.properties.alsoIndexPlus + 1,
+              tile.x + tile.properties.alsoX,
+              tile.y + tile.properties.alsoY,
+              true
+            )
+            .setCollision(true, true, true, true, true);
+          if (tile.properties.alsoY) {
+            mapLayerShadows.removeTileAt(tile.x + 1, tile.y);
+            mapLayerShadows.putTileAt(
+              tile.properties.shadow + 1,
+              tile.x,
+              tile.y,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowX + 1,
+              tile.x + 1,
+              tile.y,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowY + 1,
+              tile.x + 1,
+              tile.y + 1,
+              false
+            );
+          }
+          if (tile.properties.alsoX) {
+            mapLayerShadows.removeTileAt(tile.x, tile.y + 1);
+            mapLayerShadows.putTileAt(
+              tile.properties.shadow + 1,
+              tile.x,
+              tile.y,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowX + 1,
+              tile.x + 1,
+              tile.y + 1,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowY + 1,
+              tile.x,
+              tile.y + 1,
+              false
+            );
+          }
+        }
       }
     );
     this.physics.add.collider(
