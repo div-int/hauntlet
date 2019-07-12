@@ -42,6 +42,7 @@ let knightSpritetakingDamage: Boolean = false;
 let cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
 let fireKey: Phaser.Input.Keyboard.Key;
 let firePressed = false;
+let padAPressed = false;
 let fireClicked = false;
 let fireGroup;
 let doors = [];
@@ -706,11 +707,38 @@ export default class GameScene extends Phaser.Scene {
     let moveDown = false;
     let fireDirection = 0;
     let moving = false;
+    let padA = false;
 
     statusText.setText(
       `Keys : \x01  x ${keys} - Score : ${score} : Health : \x02  ${health}`
     );
     statusText.setTint(0xff0000, 0xff0000, 0xffff00, 0xffff00);
+
+    if (fireKey.isUp) {
+      firePressed = false;
+    }
+
+    if (this.input.gamepad.total != 0) {
+      let pad = this.input.gamepad.getPad(0);
+      let lx = pad.leftStick.x;
+      let ly = pad.leftStick.y;
+
+      if (lx < -0.5) moveLeft = true;
+      if (lx > 0.5) moveRight = true;
+      if (ly < -0.5) moveUp = true;
+      if (ly > 0.5) moveDown = true;
+
+      if (!pad.A) padAPressed = false;
+
+      if (!padAPressed) {
+        if (pad.A) {
+          padA = true;
+          padAPressed = true;
+        } else {
+          padA = false;
+        }
+      }
+    }
 
     if (pointer.isDown) {
       let touchX = pointer.x;
@@ -751,10 +779,6 @@ export default class GameScene extends Phaser.Scene {
 
     knightSprite.setDepth(100 + getDepthFromXY(knightSprite.x, knightSprite.y));
 
-    if (fireKey.isUp) {
-      firePressed = false;
-    }
-
     if (cursorKeys.right.isDown || moveRight) {
       if (fireKey.isUp) {
         knightSprite.setVelocityX(spriteVelocity);
@@ -764,7 +788,7 @@ export default class GameScene extends Phaser.Scene {
         knightSpriteDirection = "East";
         moving = true;
       }
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityX(0);
         fireDirection |= 1;
       }
@@ -777,7 +801,7 @@ export default class GameScene extends Phaser.Scene {
         knightSpriteDirection = "West";
         moving = true;
       }
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityX(0);
         fireDirection |= 4;
       }
@@ -788,7 +812,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (cursorKeys.up.isDown || moveUp) {
       knightSprite.setVelocityY(-spriteVelocity);
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityY(0);
         fireDirection |= 8;
         firePressed = true;
@@ -803,7 +827,7 @@ export default class GameScene extends Phaser.Scene {
       moving = true;
     } else if (cursorKeys.down.isDown || moveDown) {
       knightSprite.setVelocityY(spriteVelocity);
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityY(0);
         fireDirection |= 2;
         firePressed = true;

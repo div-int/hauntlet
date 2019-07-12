@@ -9,6 +9,9 @@ export default {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
+  input: {
+    gamepad: true
+  },
   physics: {
     default: "arcade",
     arcade: {
