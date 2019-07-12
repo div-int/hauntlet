@@ -72,6 +72,10 @@ function removeDoor(doorId) {
   });
 }
 
+function getDepthFromXY(x: number, y: number): number {
+  return x + y * map.widthInPixels;
+}
+
 export default class GameScene extends Phaser.Scene {
   private _level: string;
 
@@ -735,9 +739,7 @@ export default class GameScene extends Phaser.Scene {
       fireClicked = false;
     }
 
-    knightSprite.setDepth(
-      100 + knightSprite.x + knightSprite.y * map.widthInPixels
-    );
+    knightSprite.setDepth(100 + getDepthFromXY(knightSprite.x, knightSprite.y));
 
     if (fireKey.isUp) {
       firePressed = false;
