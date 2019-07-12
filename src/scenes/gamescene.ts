@@ -35,6 +35,7 @@ let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
 let skeletonSprite: Phaser.Physics.Arcade.Sprite;
 let ghostsGroup;
+let deadGhostsGroup;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSpriteDirection = "South";
 let knightSpritetakingDamage: Boolean = false;
@@ -383,6 +384,9 @@ export default class GameScene extends Phaser.Scene {
       fireGroup,
       mapLayerWalls,
       (sword: Phaser.Physics.Arcade.Sprite, tile: any) => {
+        sword.setImmovable(true);
+        sword.setAcceleration(0);
+        sword.setVelocity(0);
         sword.setFrame(4);
         this.time.delayedCall(
           120,
@@ -515,6 +519,12 @@ export default class GameScene extends Phaser.Scene {
       bounceY: 0.0
     });
 
+    deadGhostsGroup = this.physics.add.group({
+      immovable: true,
+      bounceX: 0,
+      bounceY: 0
+    });
+
     for (let i = 0; i < MAX_GHOSTS; i++) {
       ghostSprites[i] = this.physics.add
         .sprite(
@@ -607,21 +617,27 @@ export default class GameScene extends Phaser.Scene {
           [sword],
           this
         );
-        ghost.setVelocity(0, 0);
-        ghost.setAcceleration(0, 0);
-        ghostsGroup.remove(ghost);
-        ghost.play("skeletonDie", true, 0);
-        this.time.delayedCall(
-          1000,
-          ghostDead => {
-            ghostDead.destroy();
-          },
-          [ghost],
-          this
-        );
-        score += 10;
+        if (ghost.anims.currentAnim.key != "skeletonDie") {
+          ghost.setVelocity(0, 0);
+          ghost.setAcceleration(0, 0);
+          ghostsGroup.remove(ghost);
+          deadGhostsGroup.add(ghost);
+          ghost.play("skeletonDie", true, 0);
+          this.time.delayedCall(
+            1000,
+            ghostDead => {
+              ghostDead.destroy();
+            },
+            [ghost],
+            this
+          );
+          score += 10;
+        }
       }
     );
+
+    this.physics.add.collider(knightSprite, deadGhostsGroup);
+    this.physics.add.collider(ghostsGroup, deadGhostsGroup);
 
     this.physics.add.collider(ghostsGroup, mapLayerDoors);
     this.physics.add.collider(
@@ -665,7 +681,7 @@ export default class GameScene extends Phaser.Scene {
       map.widthInPixels * displayScale,
       map.heightInPixels * displayScale
     );
-    this.cameras.main.startFollow(knightSprite, false, 0.8, 0.8, 0.5, 0.5);
+    this.cameras.main.startFollow(knightSprite, true, 0.8, 0.8, 0.5, 0.5);
   }
 
   update() {
@@ -839,13 +855,13 @@ export default class GameScene extends Phaser.Scene {
           "swordSprite",
           fireFrame
         )
-        .setDepth(10000001)
+        .setDepth(100000001)
         .setSize(10, 10)
         .setOffset(5, 5);
       fireGroup.add(newSword, false);
 
       newSword
-        .setDepth(6)
+        .setDepth(100000001)
         .setScale(spriteScale, spriteScale)
         .setVelocityX(vx)
         .setVelocityY(vy)
