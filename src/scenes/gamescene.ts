@@ -31,7 +31,7 @@ let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let displayScale = 2;
 let spriteScale = 2;
 let spriteVelocity = 200;
-let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
+let swords: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
 let skeletonSprite: Phaser.Physics.Arcade.Sprite;
 let ghostsGroup;
@@ -635,6 +635,16 @@ export default class GameScene extends Phaser.Scene {
             [ghost],
             this
           );
+          this.add.tween({
+            targets: [ghost],
+            ease: "Sine.easInOut",
+            duration: 500,
+            delay: 500,
+            alpha: {
+              getStart: () => 1,
+              getEnd: () => 0
+            }
+          });
           score += 10;
         }
       }
@@ -857,18 +867,19 @@ export default class GameScene extends Phaser.Scene {
           "swordSprite",
           fireFrame
         )
-        .setDepth(100000001)
+        .setDepth(101 + getDepthFromXY(knightSprite.x, knightSprite.y))
         .setSize(10, 10)
         .setOffset(5, 5);
       fireGroup.add(newSword, false);
 
       newSword
-        .setDepth(100000001)
+        .setDepth(101 + getDepthFromXY(knightSprite.x, knightSprite.y))
         .setScale(spriteScale, spriteScale)
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
 
+      swords.push(newSword);
       firePressed = true;
     }
 
@@ -881,7 +892,7 @@ export default class GameScene extends Phaser.Scene {
         ghostSprites[i].anims.currentAnim.key != "skeletonDie"
       ) {
         ghostSprites[i].setDepth(
-          100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
+          100 + getDepthFromXY(ghostSprites[i].x, ghostSprites[i].y)
         );
         ghostXDiff = ghostSprites[i].x - knightSprite.x;
         ghostYDiff = ghostSprites[i].y - knightSprite.y;
@@ -948,5 +959,11 @@ export default class GameScene extends Phaser.Scene {
         }
       }
     }
+    swords.forEach((sword: Phaser.Physics.Arcade.Sprite) => {
+      if (sword.visible === true) {
+        // console.log(sword);
+        sword.setDepth(100 + getDepthFromXY(sword.x, sword.y));
+      }
+    });
   }
 }
