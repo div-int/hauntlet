@@ -146,15 +146,15 @@ export default class GameScene extends Phaser.Scene {
     mapLayerWalls = map
       .createDynamicLayer("Walls", mapTiles, 0, 0)
       .setScale(displayScale, displayScale)
-      .setDepth(2);
+      .setDepth(4);
     mapLayerExits = map
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(3);
+      .setDepth(2);
     mapLayerShadows = map
       .createDynamicLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(4);
+      .setDepth(3);
     mapLayerItems = map
       .createDynamicLayer("Items", itemTiles)
       .setScale(displayScale, displayScale)
@@ -577,7 +577,7 @@ export default class GameScene extends Phaser.Scene {
       mapLayerItems,
       (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
         if (item.index != -1) {
-          if (knight.x >> 6 === item.x && knight.y >> 6 === item.y - 1) {
+          if (knight.x >> 6 === item.x && (knight.y - 1) >> 6 === item.y - 1) {
             // console.log(
             //   `Collected item ${item.properties.name}: ${item.properties.type}`,
             //   item
