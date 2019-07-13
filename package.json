@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/div-int/phaser3-typescript-webpack#readme",
   "devDependencies": {
+    "lodash": ">=4.17.13",
     "@babel/core": "^7.5.0",
     "@babel/preset-env": "^7.5.0",
     "@babel/preset-typescript": "^7.3.3",
