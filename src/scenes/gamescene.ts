@@ -28,8 +28,8 @@ let mapLayerItems: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
-let displayScale = 2;
-let spriteScale = 2;
+let displayScale = 1;
+let spriteScale = 1;
 let spriteVelocity = 200;
 let swords: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
@@ -577,7 +577,7 @@ export default class GameScene extends Phaser.Scene {
       mapLayerItems,
       (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
         if (item.index != -1) {
-          if (knight.x >> 6 === item.x && (knight.y - 1) >> 6 === item.y - 1) {
+          if (knight.x >> 5 === item.x && (knight.y - 1) >> 5 === item.y - 1) {
             // console.log(
             //   `Collected item ${item.properties.name}: ${item.properties.type}`,
             //   item
