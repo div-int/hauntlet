@@ -146,7 +146,7 @@ export default class GameScene extends Phaser.Scene {
     mapLayerWalls = map
       .createDynamicLayer("Walls", mapTiles, 0, 0)
       .setScale(displayScale, displayScale)
-      .setDepth(4);
+      .setDepth(5);
     mapLayerExits = map
       .createStaticLayer("Exits", mapTiles)
       .setScale(displayScale, displayScale)
@@ -154,11 +154,11 @@ export default class GameScene extends Phaser.Scene {
     mapLayerShadows = map
       .createDynamicLayer("Shadows", mapTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(3);
+      .setDepth(4);
     mapLayerItems = map
       .createDynamicLayer("Items", itemTiles)
       .setScale(displayScale, displayScale)
-      .setDepth(5);
+      .setDepth(3);
     mapLayerDoors = map
       .createBlankDynamicLayer("Doors", mapTiles)
       .setScale(displayScale, displayScale)
