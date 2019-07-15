@@ -49,7 +49,7 @@ let score: number = 0;
 let health: number = 800;
 let statusText: Phaser.GameObjects.BitmapText;
 
-function findDoorAt(x, y) {
+async function findDoorAt(x, y) {
   let foundDoorId: string;
 
   Object.entries(doors).forEach(door => {
@@ -63,7 +63,8 @@ function findDoorAt(x, y) {
   return foundDoorId;
 }
 
-function removeDoor(doorId) {
+async function removeDoorAt(x, y) {
+  const doorId = await findDoorAt(x, y);
   // console.log(`removeDoor(${doorId})`);
   doors[doorId].forEach(location => {
     mapLayerDoors.removeTileAt(location.x, location.y, false, true);
@@ -550,7 +551,7 @@ export default class GameScene extends Phaser.Scene {
       mapLayerDoors,
       (o1: any, o2: any) => {
         if (o1.name === "Player" && keys > 0) {
-          removeDoor(findDoorAt(o2.x, o2.y));
+          removeDoorAt(o2.x, o2.y);
           keys--;
           // @ts-ignore
           //console.log(o2.index, o2.x, o2.y);
@@ -565,11 +566,8 @@ export default class GameScene extends Phaser.Scene {
       mapLayerItems,
       (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
         if (item.index != -1) {
-          if (knight.x >> 5 === item.x && (knight.y - 1) >> 5 === item.y - 1) {
-            // console.log(
-            //   `Collected item ${item.properties.name}: ${item.properties.type}`,
-            //   item
-            // );
+          if (true) {
+            //knight.x >> 5 === item.x && (knight.y - 1) >> 5 === item.y - 1) {
             let consume: boolean = false;
             if (item.properties.type === "key") {
               keys++;
