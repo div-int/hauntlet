@@ -16,7 +16,7 @@ let pressStart2PXML = require("../assets/images/fonts/press-start-2p.xml");
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 128;
+const MAX_GHOSTS = 128;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
@@ -36,7 +36,7 @@ let ghostsGroup: Phaser.Physics.Arcade.Group;
 let deadGhostsGroup: Phaser.Physics.Arcade.Group;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSpriteDirection = "South";
-let knightSpritetakingDamage: Boolean = false;
+let knightSpritetakingDamage = false;
 let cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
 let fireKey: Phaser.Input.Keyboard.Key;
 let firePressed = false;
@@ -44,9 +44,9 @@ let padAPressed = false;
 let fireClicked = false;
 let fireGroup: Phaser.Physics.Arcade.Group;
 let doors = [];
-let keys: number = 0;
-let score: number = 0;
-let health: number = 800;
+let keys = 0;
+let score = 0;
+let health = 800;
 let statusText: Phaser.GameObjects.BitmapText;
 
 async function findDoorAt(x, y) {
@@ -883,7 +883,7 @@ export default class GameScene extends Phaser.Scene {
       firePressed = true;
     }
 
-    let ghostXDiff, ghostYDiff;
+    let ghostXDiff: number, ghostYDiff: number;
 
     for (let i = 0; i < MAX_GHOSTS; i++) {
       //console.log(ghostSprites[i]);
