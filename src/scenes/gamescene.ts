@@ -6,6 +6,7 @@ import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 let levelJSON: any;
 let logoPNG = require("../assets/images/logo.png");
 let levelTilesPNG = require("../assets/images/tiles/placeholder.extruded.png");
+let tileset0TilesPNG = require("../assets/images/tiles/tileset_0.extruded.png");
 let itemTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
@@ -22,6 +23,7 @@ const MAX_GHOSTS = 128;
 let logo: Phaser.GameObjects.Image;
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
+let tileset0Tiles: Phaser.Tilemaps.Tileset;
 let itemTiles: Phaser.Tilemaps.Tileset;
 let mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
@@ -154,6 +156,7 @@ export default class GameScene extends Phaser.Scene {
     levelJSON = require(`../assets/maps/tiled/${this._level}.json`);
     this.load.tilemapTiledJSON("levelMap", levelJSON);
     this.load.image("levelTiles", levelTilesPNG);
+    this.load.image("tileset_0Tiles", tileset0TilesPNG);
     this.load.image("itemTiles", itemTilesPNG);
     this.load.spritesheet("knightSprite", knightSpritePNG, {
       frameWidth: 64,
@@ -175,16 +178,23 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     map = this.add.tilemap("levelMap");
+
     mapTiles = map.addTilesetImage("level", "levelTiles");
     itemTiles = map.addTilesetImage("items", "itemTiles");
-    mapLayerFloor = map.createStaticLayer("Floor", mapTiles).setDepth(1);
-    mapLayerWalls = map.createDynamicLayer("Walls", mapTiles).setDepth(5);
-    mapLayerExits = map.createStaticLayer("Exits", mapTiles).setDepth(2);
-    mapLayerShadows = map.createDynamicLayer("Shadows", mapTiles).setDepth(4);
+    tileset0Tiles = map.addTilesetImage("tileset_0", "tileset_0Tiles");
+
+    mapLayerFloor = map.createStaticLayer("Floor", tileset0Tiles).setDepth(1);
+    mapLayerWalls = map.createDynamicLayer("Walls", tileset0Tiles).setDepth(4);
+    mapLayerExits = map.createStaticLayer("Exits", tileset0Tiles).setDepth(2);
+    mapLayerShadows = map
+      .createDynamicLayer("Shadows", tileset0Tiles)
+      .setDepth(5);
     mapLayerItems = map.createDynamicLayer("Items", itemTiles).setDepth(3);
-    mapLayerDoors = map.createBlankDynamicLayer("Doors", mapTiles).setDepth(10);
+    mapLayerDoors = map
+      .createBlankDynamicLayer("Doors", tileset0Tiles)
+      .setDepth(10);
     mapLayerDoorShadows = map
-      .createDynamicLayer("DoorShadows", mapTiles, 0, 0)
+      .createDynamicLayer("DoorShadows", tileset0Tiles, 0, 0)
       .setDepth(4);
 
     const objects = map.findObject("Doors", o => {
@@ -385,8 +395,8 @@ export default class GameScene extends Phaser.Scene {
       .setDepth(7);
 
     knightSprite
-      .setSize(20, 32)
-      .setOffset(28, 32)
+      .setSize(32, 32)
+      .setOffset(16, 32)
       .setMaxVelocity(spriteVelocity)
       .setCollideWorldBounds(true)
       .anims.play("knightIdleSouth");
@@ -554,8 +564,8 @@ export default class GameScene extends Phaser.Scene {
         .setAlpha(1.0) //.setAlpha(0.7)
         .setScrollFactor(1, 1)
         .setDepth(5)
-        .setSize(24, 32)
-        .setOffset(24, 32)
+        .setSize(32, 32)
+        .setOffset(16, 32)
         .setMaxVelocity(100);
       ghostSprites[i].name = "Ghost";
       ghostSprites[i].setCollideWorldBounds(true);

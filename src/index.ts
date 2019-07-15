@@ -21,5 +21,5 @@ class HauntletGame extends Phaser.Game {
 window.onload = function() {
   //window.game = new HauntletGame();
 
-  var hauntletGame = new HauntletGame(config, "level_3");
+  var hauntletGame = new HauntletGame(config, "level_4");
 };
