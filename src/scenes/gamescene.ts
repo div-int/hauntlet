@@ -28,8 +28,6 @@ let mapLayerItems: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
-// let displayScale = 1;
-// let spriteScale = displayScale;
 let spriteVelocity = 200;
 let swords: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
@@ -77,6 +75,47 @@ function getDepthFromXY(x: number, y: number): number {
   return x + y * map.widthInPixels;
 }
 
+export class UIScene extends Phaser.Scene {
+  constructor() {
+    super("UIScene");
+    console.log(`UIScene::constructor() : ${Version}`);
+  }
+
+  preload() {
+    this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
+  }
+
+  create() {
+    console.log(`UIScene::create() : ${Version}`);
+    this.add
+      .bitmapText(12, 12, "press-start-2p", `Version : ${Version}`, 8, 0)
+      .setDepth(20000001)
+      .setScrollFactor(0, 0)
+      .setTint(0x00ff00, 0x00ff00, 0x00ffff, 0x00ffff)
+      .setScale(2, 2);
+
+    statusText = this.add
+      .bitmapText(
+        12,
+        44,
+        "press-start-2p",
+        "Keys : \x01  x 0 - Score : 0 : Health : \x02  0",
+        8,
+        0
+      )
+      .setDepth(20000001)
+      .setScrollFactor(0, 0)
+      .setScale(2, 2);
+  }
+
+  update() {
+    statusText.setText(
+      `Keys : \x01  x ${keys} - Score : ${score} : Health : \x02  ${health}`
+    );
+    statusText.setTint(0xff0000, 0xff0000, 0xffff00, 0xffff00);
+  }
+}
+
 export default class GameScene extends Phaser.Scene {
   private _level: string;
 
@@ -89,7 +128,6 @@ export default class GameScene extends Phaser.Scene {
 
   preload() {
     levelJSON = require(`../assets/maps/tiled/${this._level}.json`);
-    this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
     this.load.tilemapTiledJSON("levelMap", levelJSON);
     this.load.image("levelTiles", levelTilesPNG);
     this.load.image("itemTiles", itemTilesPNG);
@@ -112,30 +150,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.add
-      .bitmapText(12, 12, "press-start-2p", `Version : ${Version}`, 8, 0)
-      .setDepth(20000001)
-      .setScrollFactor(0, 0)
-      .setTint(0x00ff00, 0x00ff00, 0x00ffff, 0x00ffff)
-      .setScale(2, 2);
-    // this.add
-    //   .text(8, 8, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
-    //   .setDepth(20000001)
-    //   .setScrollFactor(0, 0);
-
-    statusText = this.add
-      .bitmapText(
-        12,
-        44,
-        "press-start-2p",
-        "Keys : \x01  x 0 - Score : 0 : Health : \x02  0",
-        8,
-        0
-      )
-      .setDepth(20000001)
-      .setScrollFactor(0, 0)
-      .setScale(2, 2);
-
     map = this.add.tilemap("levelMap");
     mapTiles = map.addTilesetImage("level", "levelTiles");
     itemTiles = map.addTilesetImage("items", "itemTiles");
@@ -667,7 +681,14 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main
       .startFollow(knightSprite, false, 0.1, 0.1, 0.5, 0.5)
-      .setZoom(2);
+      .setZoom(1);
+
+    this.tweens.add({
+      targets: this.cameras.main,
+      zoom: 2,
+      ease: "Sine.easeInOut",
+      repeat: 0
+    });
   }
 
   update() {
@@ -679,11 +700,6 @@ export default class GameScene extends Phaser.Scene {
     let fireDirection = 0;
     let moving = false;
     let padA = false;
-
-    statusText.setText(
-      `Keys : \x01  x ${keys} - Score : ${score} : Health : \x02  ${health}`
-    );
-    statusText.setTint(0xff0000, 0xff0000, 0xffff00, 0xffff00);
 
     if (fireKey.isUp) {
       firePressed = false;

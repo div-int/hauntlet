@@ -1,6 +1,6 @@
 import "phaser";
 import config from "./config/config";
-import GameScene from "./scenes/gamescene";
+import GameScene, { UIScene } from "./scenes/gamescene";
 class HauntletGame extends Phaser.Game {
   version: string;
 
@@ -8,7 +8,9 @@ class HauntletGame extends Phaser.Game {
     super(config);
 
     this.scene.add("GameScene", new GameScene(startlevel));
+    this.scene.add("UIScene", new UIScene());
     this.scene.start("GameScene");
+    this.scene.start("UIScene");
   }
 
   getVersion() {
