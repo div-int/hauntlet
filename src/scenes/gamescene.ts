@@ -4,6 +4,7 @@ import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
 let levelJSON: any;
+let logoPNG = require("../assets/images/logo.png");
 let levelTilesPNG = require("../assets/images/tiles/placeholder.extruded.png");
 let itemTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
@@ -18,6 +19,7 @@ Players.CreatePlayer("Player 1", 500);
 
 const MAX_GHOSTS = 128;
 
+let logo: Phaser.GameObjects.Image;
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
 let itemTiles: Phaser.Tilemaps.Tileset;
@@ -83,11 +85,32 @@ export class UIScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image("logo", logoPNG);
     this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
   }
 
   create() {
     console.log(`UIScene::create() : ${Version}`);
+
+    logo = this.add
+      .image(window.innerWidth >> 1, window.innerHeight >> 1, "logo")
+      .setScale(4, 4);
+
+    this.add.tween({
+      targets: logo,
+      scale: 100,
+      rotation: Math.PI,
+      alpha: 0,
+      delay: 500,
+      duration: 1500,
+      repeat: 0,
+      ease: "Sine-easeInOut",
+
+      onComplete: () => {
+        logo.destroy();
+      }
+    });
+
     this.add
       .bitmapText(12, 12, "press-start-2p", `Version : ${Version}`, 8, 0)
       .setDepth(20000001)
