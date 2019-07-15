@@ -154,7 +154,7 @@ export default class GameScene extends Phaser.Scene {
     mapTiles = map.addTilesetImage("level", "levelTiles");
     itemTiles = map.addTilesetImage("items", "itemTiles");
     mapLayerFloor = map.createStaticLayer("Floor", mapTiles).setDepth(1);
-    mapLayerWalls = map.createDynamicLayer("Walls", mapTiles, 0, 0).setDepth(5);
+    mapLayerWalls = map.createDynamicLayer("Walls", mapTiles).setDepth(5);
     mapLayerExits = map.createStaticLayer("Exits", mapTiles).setDepth(2);
     mapLayerShadows = map.createDynamicLayer("Shadows", mapTiles).setDepth(4);
     mapLayerItems = map.createDynamicLayer("Items", itemTiles).setDepth(3);
@@ -681,13 +681,15 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
     this.cameras.main
       .startFollow(knightSprite, false, 0.1, 0.1, 0.5, 0.5)
-      .setZoom(1);
+      .setZoom(1)
+      .centerOn(knightSprite.x, knightSprite.y);
 
     this.tweens.add({
       targets: this.cameras.main,
       zoom: 2,
       ease: "Sine.easeInOut",
-      repeat: 0
+      repeat: 0,
+      delay: 1000
     });
   }
 
