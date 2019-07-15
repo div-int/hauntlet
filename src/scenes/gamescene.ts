@@ -553,8 +553,6 @@ export default class GameScene extends Phaser.Scene {
         if (o1.name === "Player" && keys > 0) {
           removeDoorAt(o2.x, o2.y);
           keys--;
-          // @ts-ignore
-          //console.log(o2.index, o2.x, o2.y);
         }
       },
       null,
@@ -566,26 +564,23 @@ export default class GameScene extends Phaser.Scene {
       mapLayerItems,
       (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
         if (item.index != -1) {
-          if (true) {
-            //knight.x >> 5 === item.x && (knight.y - 1) >> 5 === item.y - 1) {
-            let consume: boolean = false;
-            if (item.properties.type === "key") {
-              keys++;
-              consume = true;
-            }
-            if (item.properties.type === "treasure") {
-              score += item.properties.value;
-              consume = true;
-            }
-            if (item.properties.type === "food") {
-              health += item.properties.value;
-              consume = true;
-            }
+          let consume: boolean = false;
+          if (item.properties.type === "key") {
+            keys++;
+            consume = true;
+          }
+          if (item.properties.type === "treasure") {
+            score += item.properties.value;
+            consume = true;
+          }
+          if (item.properties.type === "food") {
+            health += item.properties.value;
+            consume = true;
+          }
 
-            if (consume) {
-              mapLayerItems.removeTileAt(item.x, item.y);
-              //console.log(keys, score, health);
-            }
+          if (consume) {
+            mapLayerItems.removeTileAt(item.x, item.y);
+            //console.log(keys, score, health);
           }
         }
       }
@@ -903,26 +898,20 @@ export default class GameScene extends Phaser.Scene {
         ghostYDiff = ghostSprites[i].y - knightSprite.y;
 
         if (ghostXDiff < 16) {
-          ghostSprites[i].setDamping(false);
-          ghostSprites[i].setAccelerationX(Phaser.Math.Between(10, 100));
+          ghostSprites[i].setAccelerationX(Phaser.Math.Between(50, 100));
         } else if (ghostXDiff > 16) {
-          ghostSprites[i].setDamping(false);
-          ghostSprites[i].setAccelerationX(-Phaser.Math.Between(10, 100));
+          ghostSprites[i].setAccelerationX(-Phaser.Math.Between(50, 100));
         } else {
+          ghostSprites[i].setVelocityX(0);
           ghostSprites[i].setAccelerationX(0);
-          ghostSprites[i].setDamping(true);
-          ghostSprites[i].setDrag(0.25);
         }
         if (ghostYDiff < 16) {
-          ghostSprites[i].setDamping(false);
-          ghostSprites[i].setAccelerationY(Phaser.Math.Between(10, 100));
+          ghostSprites[i].setAccelerationY(Phaser.Math.Between(50, 100));
         } else if (ghostYDiff > 16) {
-          ghostSprites[i].setDamping(false);
-          ghostSprites[i].setAccelerationY(-Phaser.Math.Between(10, 100));
+          ghostSprites[i].setAccelerationY(-Phaser.Math.Between(50, 100));
         } else {
+          ghostSprites[i].setVelocityY(0);
           ghostSprites[i].setAccelerationY(0);
-          ghostSprites[i].setDamping(true);
-          ghostSprites[i].setDrag(0.25);
         }
 
         if (Math.abs(ghostXDiff) > Math.abs(ghostYDiff)) {
