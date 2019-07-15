@@ -28,14 +28,14 @@ let mapLayerItems: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
-let displayScale = 1;
-let spriteScale = 1;
+// let displayScale = 1;
+// let spriteScale = displayScale;
 let spriteVelocity = 200;
 let swords: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
 let skeletonSprite: Phaser.Physics.Arcade.Sprite;
-let ghostsGroup;
-let deadGhostsGroup;
+let ghostsGroup: Phaser.Physics.Arcade.Group;
+let deadGhostsGroup: Phaser.Physics.Arcade.Group;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSpriteDirection = "South";
 let knightSpritetakingDamage: Boolean = false;
@@ -44,7 +44,7 @@ let fireKey: Phaser.Input.Keyboard.Key;
 let firePressed = false;
 let padAPressed = false;
 let fireClicked = false;
-let fireGroup;
+let fireGroup: Phaser.Physics.Arcade.Group;
 let doors = [];
 let keys: number = 0;
 let score: number = 0;
@@ -139,33 +139,14 @@ export default class GameScene extends Phaser.Scene {
     map = this.add.tilemap("levelMap");
     mapTiles = map.addTilesetImage("level", "levelTiles");
     itemTiles = map.addTilesetImage("items", "itemTiles");
-    mapLayerFloor = map
-      .createStaticLayer("Floor", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(1);
-    mapLayerWalls = map
-      .createDynamicLayer("Walls", mapTiles, 0, 0)
-      .setScale(displayScale, displayScale)
-      .setDepth(5);
-    mapLayerExits = map
-      .createStaticLayer("Exits", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(2);
-    mapLayerShadows = map
-      .createDynamicLayer("Shadows", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(4);
-    mapLayerItems = map
-      .createDynamicLayer("Items", itemTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(3);
-    mapLayerDoors = map
-      .createBlankDynamicLayer("Doors", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(10);
+    mapLayerFloor = map.createStaticLayer("Floor", mapTiles).setDepth(1);
+    mapLayerWalls = map.createDynamicLayer("Walls", mapTiles, 0, 0).setDepth(5);
+    mapLayerExits = map.createStaticLayer("Exits", mapTiles).setDepth(2);
+    mapLayerShadows = map.createDynamicLayer("Shadows", mapTiles).setDepth(4);
+    mapLayerItems = map.createDynamicLayer("Items", itemTiles).setDepth(3);
+    mapLayerDoors = map.createBlankDynamicLayer("Doors", mapTiles).setDepth(10);
     mapLayerDoorShadows = map
       .createDynamicLayer("DoorShadows", mapTiles, 0, 0)
-      .setScale(displayScale, displayScale)
       .setDepth(4);
 
     const objects = map.findObject("Doors", o => {
@@ -190,7 +171,7 @@ export default class GameScene extends Phaser.Scene {
     map.findObject("PlayerSpawns", o => {
       SpawnPoints.Add(
         // @ts-ignore
-        new SpawnPoint(o.name, o.x * displayScale, o.y * displayScale)
+        new SpawnPoint(o.name, o.x, o.y)
       );
     });
 
@@ -353,12 +334,7 @@ export default class GameScene extends Phaser.Scene {
       repeat: 0
     });
 
-    this.physics.world.setBounds(
-      0,
-      0,
-      map.widthInPixels * displayScale,
-      map.heightInPixels * displayScale
-    );
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     knightSprite = this.physics.add
       .sprite(
@@ -373,7 +349,6 @@ export default class GameScene extends Phaser.Scene {
     knightSprite
       .setSize(20, 32)
       .setOffset(28, 32)
-      .setScale(spriteScale, spriteScale)
       .setMaxVelocity(spriteVelocity)
       .setCollideWorldBounds(true)
       .anims.play("knightIdleSouth");
@@ -543,7 +518,6 @@ export default class GameScene extends Phaser.Scene {
         .setDepth(5)
         .setSize(24, 32)
         .setOffset(24, 32)
-        .setScale(spriteScale, spriteScale) //.setScale(spriteScale * 2, spriteScale)
         .setMaxVelocity(100);
       ghostSprites[i].name = "Ghost";
       ghostSprites[i].setCollideWorldBounds(true);
@@ -690,13 +664,10 @@ export default class GameScene extends Phaser.Scene {
     cursorKeys = this.input.keyboard.createCursorKeys();
     fireKey = this.input.keyboard.addKey("A");
 
-    this.cameras.main.setBounds(
-      0,
-      0,
-      map.widthInPixels * displayScale,
-      map.heightInPixels * displayScale
-    );
-    this.cameras.main.startFollow(knightSprite, true, 0.8, 0.8, 0.5, 0.5);
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main
+      .startFollow(knightSprite, false, 0.1, 0.1, 0.5, 0.5)
+      .setZoom(2);
   }
 
   update() {
@@ -885,12 +856,7 @@ export default class GameScene extends Phaser.Scene {
       }
 
       let newSword = this.physics.add
-        .sprite(
-          knightSprite.x,
-          knightSprite.y + 8 * spriteScale,
-          "swordSprite",
-          fireFrame
-        )
+        .sprite(knightSprite.x, knightSprite.y + 8, "swordSprite", fireFrame)
         .setDepth(101 + getDepthFromXY(knightSprite.x, knightSprite.y))
         .setSize(10, 10)
         .setOffset(5, 5);
@@ -898,7 +864,6 @@ export default class GameScene extends Phaser.Scene {
 
       newSword
         .setDepth(101 + getDepthFromXY(knightSprite.x, knightSprite.y))
-        .setScale(spriteScale, spriteScale)
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
