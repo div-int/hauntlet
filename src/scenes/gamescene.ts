@@ -3,45 +3,51 @@ import { Version } from "../version";
 import { Players, Player } from "../players";
 import { SpawnPoints, SpawnPoint } from "../spawnpoints";
 
-let testJSON = require("../assets/maps/tiled/test.json");
-let testTilesPNG = require("../assets/images/tiles/placeholder.png");
+let levelJSON: any;
+let levelTilesPNG = require("../assets/images/tiles/placeholder.extruded.png");
+let itemTilesPNG = require("../assets/images/items/treasure.png");
 let knightSpritePNG = require("../assets/images/characters/test.png");
 let skeletonSpritePNG = require("../assets/images/characters/skeleton.png");
 let ghostSpritePNG = require("../assets/images/characters/ghost.png");
 let swordSpritePNG = require("../assets/images/weapons/sword.png");
+let pressStart2PPNG = require("../assets/images/fonts/press-start-2p_0.png");
+let pressStart2PXML = require("../assets/images/fonts/press-start-2p.xml");
 
 Players.MaxPlayers = 4;
 Players.CreatePlayer("Player 1", 500);
 
-const MAX_GHOSTS: integer = 256;
+const MAX_GHOSTS: integer = 128;
 
 let map: Phaser.Tilemaps.Tilemap;
 let mapTiles: Phaser.Tilemaps.Tileset;
+let itemTiles: Phaser.Tilemaps.Tileset;
 let mapLayerFloor: Phaser.Tilemaps.StaticTilemapLayer;
 let mapLayerWalls: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerExits: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerItems: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerShadows: Phaser.Tilemaps.StaticTilemapLayer;
+let mapLayerItems: Phaser.Tilemaps.DynamicTilemapLayer;
+let mapLayerShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let mapLayerDoors: Phaser.Tilemaps.DynamicTilemapLayer;
-let mapLayerRoof: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerRoofWalls: Phaser.Tilemaps.StaticTilemapLayer;
-let mapLayerRoofShadows: Phaser.Tilemaps.StaticTilemapLayer;
-let displayScale = 2;
-let spriteScale = 1;
+let mapLayerDoorShadows: Phaser.Tilemaps.DynamicTilemapLayer;
 let spriteVelocity = 200;
-let swordSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
+let swords: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSprite: Phaser.Physics.Arcade.Sprite;
 let skeletonSprite: Phaser.Physics.Arcade.Sprite;
-let ghostsGroup;
+let ghostsGroup: Phaser.Physics.Arcade.Group;
+let deadGhostsGroup: Phaser.Physics.Arcade.Group;
 let ghostSprites: Phaser.Physics.Arcade.Sprite[] = new Array();
 let knightSpriteDirection = "South";
 let knightSpritetakingDamage: Boolean = false;
 let cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
 let fireKey: Phaser.Input.Keyboard.Key;
 let firePressed = false;
+let padAPressed = false;
 let fireClicked = false;
-let fireGroup;
+let fireGroup: Phaser.Physics.Arcade.Group;
 let doors = [];
+let keys: number = 0;
+let score: number = 0;
+let health: number = 800;
+let statusText: Phaser.GameObjects.BitmapText;
 
 function findDoorAt(x, y) {
   let foundDoorId: string;
@@ -58,22 +64,73 @@ function findDoorAt(x, y) {
 }
 
 function removeDoor(doorId) {
-  console.log(`removeDoor(${doorId})`);
+  // console.log(`removeDoor(${doorId})`);
   doors[doorId].forEach(location => {
     mapLayerDoors.removeTileAt(location.x, location.y, false, true);
+    mapLayerDoorShadows.removeTileAt(location.x, location.y, false, true);
   });
 }
 
-export default class GameScene extends Phaser.Scene {
-  constructor() {
-    super("GameScene");
+function getDepthFromXY(x: number, y: number): number {
+  return x + y * map.widthInPixels;
+}
 
-    console.log(`GameScene::constructor() : ${Version}`);
+export class UIScene extends Phaser.Scene {
+  constructor() {
+    super("UIScene");
+    console.log(`UIScene::constructor() : ${Version}`);
   }
 
   preload() {
-    this.load.tilemapTiledJSON("testMap", testJSON);
-    this.load.image("testTiles", testTilesPNG);
+    this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
+  }
+
+  create() {
+    console.log(`UIScene::create() : ${Version}`);
+    this.add
+      .bitmapText(12, 12, "press-start-2p", `Version : ${Version}`, 8, 0)
+      .setDepth(20000001)
+      .setScrollFactor(0, 0)
+      .setTint(0x00ff00, 0x00ff00, 0x00ffff, 0x00ffff)
+      .setScale(2, 2);
+
+    statusText = this.add
+      .bitmapText(
+        12,
+        44,
+        "press-start-2p",
+        "Keys : \x01  x 0 - Score : 0 : Health : \x02  0",
+        8,
+        0
+      )
+      .setDepth(20000001)
+      .setScrollFactor(0, 0)
+      .setScale(2, 2);
+  }
+
+  update() {
+    statusText.setText(
+      `Keys : \x01  x ${keys} - Score : ${score} : Health : \x02  ${health}`
+    );
+    statusText.setTint(0xff0000, 0xff0000, 0xffff00, 0xffff00);
+  }
+}
+
+export default class GameScene extends Phaser.Scene {
+  private _level: string;
+
+  constructor(level: string) {
+    super("GameScene");
+    console.log(`GameScene::constructor(${level}) : ${Version}`);
+
+    this._level = level;
+  }
+
+  preload() {
+    levelJSON = require(`../assets/maps/tiled/${this._level}.json`);
+    this.load.tilemapTiledJSON("levelMap", levelJSON);
+    this.load.image("levelTiles", levelTilesPNG);
+    this.load.image("itemTiles", itemTilesPNG);
     this.load.spritesheet("knightSprite", knightSpritePNG, {
       frameWidth: 64,
       frameHeight: 64
@@ -87,67 +144,28 @@ export default class GameScene extends Phaser.Scene {
       frameHeight: 64
     });
     this.load.spritesheet("swordSprite", swordSpritePNG, {
-      frameWidth: 18,
-      frameHeight: 18
+      frameWidth: 20,
+      frameHeight: 20
     });
   }
 
   create() {
-    this.add
-      .text(4, 4, `Version : ${Version}`, { fontSize: "16px", fill: "#000" })
-      .setDepth(20000000)
-      .setScrollFactor(0, 0);
-    this.add
-      .text(3, 3, `Version : ${Version}`, { fontSize: "16px", fill: "#fff" })
-      .setDepth(20000001)
-      .setScrollFactor(0, 0);
-
-    map = this.add.tilemap("testMap");
-    mapTiles = map.addTilesetImage("test", "testTiles");
-    mapLayerFloor = map
-      .createStaticLayer("Floor", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(1);
-    mapLayerWalls = map
-      .createDynamicLayer("Walls", mapTiles, 0, 0)
-      .setScale(displayScale, displayScale)
-      .setDepth(2);
-    mapLayerExits = map
-      .createStaticLayer("Exits", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(3);
-    mapLayerShadows = map
-      .createStaticLayer("Shadows", mapTiles)
-      .setScale(displayScale, displayScale)
+    map = this.add.tilemap("levelMap");
+    mapTiles = map.addTilesetImage("level", "levelTiles");
+    itemTiles = map.addTilesetImage("items", "itemTiles");
+    mapLayerFloor = map.createStaticLayer("Floor", mapTiles).setDepth(1);
+    mapLayerWalls = map.createDynamicLayer("Walls", mapTiles).setDepth(5);
+    mapLayerExits = map.createStaticLayer("Exits", mapTiles).setDepth(2);
+    mapLayerShadows = map.createDynamicLayer("Shadows", mapTiles).setDepth(4);
+    mapLayerItems = map.createDynamicLayer("Items", itemTiles).setDepth(3);
+    mapLayerDoors = map.createBlankDynamicLayer("Doors", mapTiles).setDepth(10);
+    mapLayerDoorShadows = map
+      .createDynamicLayer("DoorShadows", mapTiles, 0, 0)
       .setDepth(4);
-    mapLayerItems = map
-      .createStaticLayer("Items", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(5);
-    mapLayerDoors = map
-      .createBlankDynamicLayer("Doors", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(10);
-    mapLayerRoof = map
-      .createStaticLayer("Roof", mapTiles)
-      .setScale(displayScale, displayScale)
-      .setDepth(100000000);
-    mapLayerRoofShadows = map
-      .createStaticLayer("RoofShadows", mapTiles)
-      .setX(16 * displayScale)
-      .setY(16 * displayScale)
-      .setScale(displayScale, displayScale)
-      .setDepth(100000001);
-    mapLayerRoofWalls = map
-      .createStaticLayer("RoofWalls", mapTiles)
-      .setX(32)
-      .setY(32)
-      .setScale(displayScale, displayScale)
-      .setDepth(100000002);
 
     const objects = map.findObject("Doors", o => {
       // @ts-ignore
-      console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
+      // console.log(`${o.gid},${o.name},${o.type},${o.x >> 5},${(o.y >> 5) - 1}`);
       // @ts-ignore
       mapLayerDoors.putTileAt(o.gid, o.x >> 5, (o.y >> 5) - 1);
       // @ts-ignore
@@ -167,12 +185,13 @@ export default class GameScene extends Phaser.Scene {
     map.findObject("PlayerSpawns", o => {
       SpawnPoints.Add(
         // @ts-ignore
-        new SpawnPoint(o.name, o.x * displayScale, o.y * displayScale)
+        new SpawnPoint(o.name, o.x, o.y)
       );
     });
 
     mapLayerWalls.setCollisionByExclusion([-1], true, true);
     mapLayerDoors.setCollisionByExclusion([-1], true, true);
+    //mapLayerItems.setCollisionByExclusion([-1], true, true);
 
     this.anims.create({
       key: "knightIdleNorth",
@@ -319,13 +338,17 @@ export default class GameScene extends Phaser.Scene {
       frameRate: 15,
       repeat: -1
     });
+    this.anims.create({
+      key: "skeletonDie",
+      frames: this.anims.generateFrameNumbers("skeletonSprite", {
+        start: 0 + 20 * 13,
+        end: 5 + 20 * 13
+      }),
+      frameRate: 15,
+      repeat: 0
+    });
 
-    this.physics.world.setBounds(
-      0,
-      0,
-      map.widthInPixels * displayScale,
-      map.heightInPixels * displayScale
-    );
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
     knightSprite = this.physics.add
       .sprite(
@@ -340,7 +363,6 @@ export default class GameScene extends Phaser.Scene {
     knightSprite
       .setSize(20, 32)
       .setOffset(28, 32)
-      .setScale(spriteScale, spriteScale)
       .setMaxVelocity(spriteVelocity)
       .setCollideWorldBounds(true)
       .anims.play("knightIdleSouth");
@@ -355,16 +377,96 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(
       fireGroup,
       mapLayerWalls,
-      (sword: Phaser.Physics.Arcade.Sprite, tile) => {
-        //console.log(sword, tile);
-        sword.destroy();
+      (sword: Phaser.Physics.Arcade.Sprite, tile: any) => {
+        sword.setImmovable(true);
+        sword.setAcceleration(0);
+        sword.setVelocity(0);
+        sword.setFrame(4);
+        this.time.delayedCall(
+          120,
+          (swordHit: Phaser.Physics.Arcade.Sprite) => {
+            swordHit.destroy();
+          },
+          [sword],
+          this
+        );
+
+        if (tile.properties.destructable) {
+          mapLayerWalls.removeTileAt(tile.x, tile.y);
+          mapLayerWalls
+            .putTileAt(
+              tile.properties.alsoIndexMinus + 1,
+              tile.x - tile.properties.alsoX,
+              tile.y - tile.properties.alsoY,
+              true
+            )
+            .setCollision(true, true, true, true, true);
+          mapLayerWalls
+            .putTileAt(
+              tile.properties.alsoIndexPlus + 1,
+              tile.x + tile.properties.alsoX,
+              tile.y + tile.properties.alsoY,
+              true
+            )
+            .setCollision(true, true, true, true, true);
+          if (tile.properties.alsoY) {
+            mapLayerShadows.removeTileAt(tile.x + 1, tile.y);
+            mapLayerShadows.putTileAt(
+              tile.properties.shadow + 1,
+              tile.x,
+              tile.y,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowX + 1,
+              tile.x + 1,
+              tile.y,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowY + 1,
+              tile.x + 1,
+              tile.y + 1,
+              false
+            );
+          }
+          if (tile.properties.alsoX) {
+            mapLayerShadows.removeTileAt(tile.x, tile.y + 1);
+            mapLayerShadows.putTileAt(
+              tile.properties.shadow + 1,
+              tile.x,
+              tile.y,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowX + 1,
+              tile.x + 1,
+              tile.y + 1,
+              false
+            );
+            mapLayerShadows.putTileAt(
+              tile.properties.shadowY + 1,
+              tile.x,
+              tile.y + 1,
+              false
+            );
+          }
+        }
       }
     );
     this.physics.add.collider(
       fireGroup,
       mapLayerDoors,
       (sword: Phaser.Physics.Arcade.Sprite, door) => {
-        sword.destroy();
+        sword.setFrame(4);
+        this.time.delayedCall(
+          120,
+          (swordHit: Phaser.Physics.Arcade.Sprite) => {
+            swordHit.destroy();
+          },
+          [sword],
+          this
+        );
       }
     );
 
@@ -411,6 +513,12 @@ export default class GameScene extends Phaser.Scene {
       bounceY: 0.0
     });
 
+    deadGhostsGroup = this.physics.add.group({
+      immovable: true,
+      bounceX: 0,
+      bounceY: 0
+    });
+
     for (let i = 0; i < MAX_GHOSTS; i++) {
       ghostSprites[i] = this.physics.add
         .sprite(
@@ -424,7 +532,6 @@ export default class GameScene extends Phaser.Scene {
         .setDepth(5)
         .setSize(24, 32)
         .setOffset(24, 32)
-        .setScale(spriteScale, spriteScale) //.setScale(spriteScale * 2, spriteScale)
         .setMaxVelocity(100);
       ghostSprites[i].name = "Ghost";
       ghostSprites[i].setCollideWorldBounds(true);
@@ -441,10 +548,10 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.collider(
       knightSprite,
       mapLayerDoors,
-      (o1, o2) => {
-        if (o1.name === "Player") {
-          // @ts-ignore
+      (o1: any, o2: any) => {
+        if (o1.name === "Player" && keys > 0) {
           removeDoor(findDoorAt(o2.x, o2.y));
+          keys--;
           // @ts-ignore
           //console.log(o2.index, o2.x, o2.y);
         }
@@ -452,6 +559,40 @@ export default class GameScene extends Phaser.Scene {
       null,
       this
     );
+
+    this.physics.add.overlap(
+      knightSprite,
+      mapLayerItems,
+      (knight: Phaser.Physics.Arcade.Sprite, item: any) => {
+        if (item.index != -1) {
+          if (knight.x >> 5 === item.x && (knight.y - 1) >> 5 === item.y - 1) {
+            // console.log(
+            //   `Collected item ${item.properties.name}: ${item.properties.type}`,
+            //   item
+            // );
+            let consume: boolean = false;
+            if (item.properties.type === "key") {
+              keys++;
+              consume = true;
+            }
+            if (item.properties.type === "treasure") {
+              score += item.properties.value;
+              consume = true;
+            }
+            if (item.properties.type === "food") {
+              health += item.properties.value;
+              consume = true;
+            }
+
+            if (consume) {
+              mapLayerItems.removeTileAt(item.x, item.y);
+              //console.log(keys, score, health);
+            }
+          }
+        }
+      }
+    );
+
     this.physics.add.collider(
       ghostsGroup,
       fireGroup,
@@ -460,10 +601,46 @@ export default class GameScene extends Phaser.Scene {
         sword: Phaser.Physics.Arcade.Sprite
       ) => {
         //console.log(ghost, sword);
-        sword.destroy();
-        ghost.destroy();
+        sword.setFrame(4);
+        this.time.delayedCall(
+          120,
+          (swordHit: Phaser.Physics.Arcade.Sprite) => {
+            swordHit.destroy();
+          },
+          [sword],
+          this
+        );
+        if (ghost.anims.currentAnim.key != "skeletonDie") {
+          ghost.setVelocity(0, 0);
+          ghost.setAcceleration(0, 0);
+          ghostsGroup.remove(ghost);
+          deadGhostsGroup.add(ghost);
+          ghost.play("skeletonDie", true, 0);
+          this.time.delayedCall(
+            1000,
+            ghostDead => {
+              ghostDead.destroy();
+            },
+            [ghost],
+            this
+          );
+          this.add.tween({
+            targets: [ghost],
+            ease: "Sine.easInOut",
+            duration: 500,
+            delay: 500,
+            alpha: {
+              getStart: () => 1,
+              getEnd: () => 0
+            }
+          });
+          score += 10;
+        }
       }
     );
+
+    this.physics.add.collider(knightSprite, deadGhostsGroup);
+    this.physics.add.collider(ghostsGroup, deadGhostsGroup);
 
     this.physics.add.collider(ghostsGroup, mapLayerDoors);
     this.physics.add.collider(
@@ -472,6 +649,7 @@ export default class GameScene extends Phaser.Scene {
       (o1: Phaser.Physics.Arcade.Sprite, o2: Phaser.Physics.Arcade.Sprite) => {
         if (knightSpritetakingDamage === false) {
           knightSpritetakingDamage = true;
+          health--;
           this.time.delayedCall(
             50,
             () => {
@@ -489,7 +667,7 @@ export default class GameScene extends Phaser.Scene {
             null,
             this
           );
-          console.log("Ghost and player collided");
+          // console.log("Ghost and player collided");
         }
       },
       null,
@@ -500,13 +678,19 @@ export default class GameScene extends Phaser.Scene {
     cursorKeys = this.input.keyboard.createCursorKeys();
     fireKey = this.input.keyboard.addKey("A");
 
-    this.cameras.main.setBounds(
-      0,
-      0,
-      map.widthInPixels * displayScale,
-      map.heightInPixels * displayScale
-    );
-    this.cameras.main.startFollow(knightSprite, false, 0.8, 0.8, 0.5, 0.5);
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    this.cameras.main
+      .startFollow(knightSprite, false, 0.1, 0.1, 0.5, 0.5)
+      .setZoom(1)
+      .centerOn(knightSprite.x, knightSprite.y);
+
+    this.tweens.add({
+      targets: this.cameras.main,
+      zoom: 2,
+      ease: "Sine.easeInOut",
+      repeat: 0,
+      delay: 1000
+    });
   }
 
   update() {
@@ -517,6 +701,33 @@ export default class GameScene extends Phaser.Scene {
     let moveDown = false;
     let fireDirection = 0;
     let moving = false;
+    let padA = false;
+
+    if (fireKey.isUp) {
+      firePressed = false;
+    }
+
+    if (this.input.gamepad.total != 0) {
+      let pad = this.input.gamepad.getPad(0);
+      let lx = pad.leftStick.x;
+      let ly = pad.leftStick.y;
+
+      if (lx < -0.5) moveLeft = true;
+      if (lx > 0.5) moveRight = true;
+      if (ly < -0.5) moveUp = true;
+      if (ly > 0.5) moveDown = true;
+
+      if (!pad.A) padAPressed = false;
+
+      if (!padAPressed) {
+        if (pad.A) {
+          padA = true;
+          padAPressed = true;
+        } else {
+          padA = false;
+        }
+      }
+    }
 
     if (pointer.isDown) {
       let touchX = pointer.x;
@@ -555,13 +766,7 @@ export default class GameScene extends Phaser.Scene {
       fireClicked = false;
     }
 
-    knightSprite.setDepth(
-      100 + knightSprite.x + knightSprite.y * map.widthInPixels
-    );
-
-    if (fireKey.isUp) {
-      firePressed = false;
-    }
+    knightSprite.setDepth(100 + getDepthFromXY(knightSprite.x, knightSprite.y));
 
     if (cursorKeys.right.isDown || moveRight) {
       if (fireKey.isUp) {
@@ -572,7 +777,7 @@ export default class GameScene extends Phaser.Scene {
         knightSpriteDirection = "East";
         moving = true;
       }
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityX(0);
         fireDirection |= 1;
       }
@@ -585,7 +790,7 @@ export default class GameScene extends Phaser.Scene {
         knightSpriteDirection = "West";
         moving = true;
       }
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityX(0);
         fireDirection |= 4;
       }
@@ -596,7 +801,7 @@ export default class GameScene extends Phaser.Scene {
 
     if (cursorKeys.up.isDown || moveUp) {
       knightSprite.setVelocityY(-spriteVelocity);
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityY(0);
         fireDirection |= 8;
         firePressed = true;
@@ -611,7 +816,7 @@ export default class GameScene extends Phaser.Scene {
       moving = true;
     } else if (cursorKeys.down.isDown || moveDown) {
       knightSprite.setVelocityY(spriteVelocity);
-      if (fireKey.isDown && !firePressed) {
+      if ((fireKey.isDown || padA) && !firePressed) {
         knightSprite.setVelocityY(0);
         fireDirection |= 2;
         firePressed = true;
@@ -668,21 +873,20 @@ export default class GameScene extends Phaser.Scene {
         fireFrame -= 3;
       }
 
-      let newSword = this.physics.add.sprite(
-        knightSprite.x,
-        knightSprite.y,
-        "swordSprite",
-        fireFrame
-      );
+      let newSword = this.physics.add
+        .sprite(knightSprite.x, knightSprite.y + 8, "swordSprite", fireFrame)
+        .setDepth(101 + getDepthFromXY(knightSprite.x, knightSprite.y))
+        .setSize(10, 10)
+        .setOffset(5, 5);
       fireGroup.add(newSword, false);
 
       newSword
-        .setDepth(6)
-        .setScale(1, 1)
+        .setDepth(101 + getDepthFromXY(knightSprite.x, knightSprite.y))
         .setVelocityX(vx)
         .setVelocityY(vy)
         .setCollideWorldBounds(true);
 
+      swords.push(newSword);
       firePressed = true;
     }
 
@@ -690,9 +894,12 @@ export default class GameScene extends Phaser.Scene {
 
     for (let i = 0; i < MAX_GHOSTS; i++) {
       //console.log(ghostSprites[i]);
-      if (ghostSprites[i].active) {
+      if (
+        ghostSprites[i].active &&
+        ghostSprites[i].anims.currentAnim.key != "skeletonDie"
+      ) {
         ghostSprites[i].setDepth(
-          100 + ghostSprites[i].x + ghostSprites[i].y * map.widthInPixels
+          100 + getDepthFromXY(ghostSprites[i].x, ghostSprites[i].y)
         );
         ghostXDiff = ghostSprites[i].x - knightSprite.x;
         ghostYDiff = ghostSprites[i].y - knightSprite.y;
@@ -759,5 +966,11 @@ export default class GameScene extends Phaser.Scene {
         }
       }
     }
+    swords.forEach((sword: Phaser.Physics.Arcade.Sprite) => {
+      if (sword.visible === true) {
+        // console.log(sword);
+        sword.setDepth(100 + getDepthFromXY(sword.x, sword.y));
+      }
+    });
   }
 }
