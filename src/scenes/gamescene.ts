@@ -53,7 +53,8 @@ let score = 0;
 let health = 800;
 let statusText: Phaser.GameObjects.BitmapText;
 
-async function findDoorAt(x, y) {
+/** Asynchronous function to find door id at tile x & y */
+async function findDoorAt(x: number, y: number) {
   let foundDoorId: string;
 
   Object.entries(doors).forEach(door => {
@@ -67,7 +68,8 @@ async function findDoorAt(x, y) {
   return foundDoorId;
 }
 
-async function removeDoorAt(x, y) {
+/** Asynchronous function to remove the door found at tile x & y */
+async function removeDoorAt(x: number, y: number) {
   const doorId = await findDoorAt(x, y);
   // console.log(`removeDoor(${doorId})`);
   doors[doorId].forEach(location => {
@@ -79,18 +81,21 @@ async function removeDoorAt(x, y) {
 function getDepthFromXY(x: number, y: number): number {
   return x + y * map.widthInPixels;
 }
-
+//** Phaser 3 scene for game UI */
 export class UIScene extends Phaser.Scene {
+  /** Constructor for UIScene */
   constructor() {
     super("UIScene");
     console.log(`UIScene::constructor() : ${Version}`);
   }
 
+  /** Preload function for UIScene */
   preload() {
     this.load.image("logo", logoPNG);
     this.load.bitmapFont("press-start-2p", pressStart2PPNG, pressStart2PXML);
   }
 
+  /** Create function for UIScene */
   create() {
     console.log(`UIScene::create() : ${Version}`);
 
@@ -134,6 +139,7 @@ export class UIScene extends Phaser.Scene {
       .setScale(2, 2);
   }
 
+  /** Update function for UIScene */
   update() {
     statusText.setText(
       `Keys : \x01  x ${keys} - Score : ${score} : Health : \x02  ${health}`
@@ -142,9 +148,15 @@ export class UIScene extends Phaser.Scene {
   }
 }
 
+/** Phaser 3 scene to load level and play it.
+ * @extends Phaser.Scene
+ */
 export default class GameScene extends Phaser.Scene {
   private _level: string;
 
+  /** Constructor function for GameScene.
+   * @param level The filename of the level to load.
+   */
   constructor(level: string) {
     super("GameScene");
     console.log(`GameScene::constructor(${level}) : ${Version}`);
