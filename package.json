@@ -41,7 +41,7 @@
     "webpack-merge": "^4.2.1"
   },
   "dependencies": {
-    "lodash": ">=4.17.13",
+    "lodash": ">=4.17.19",
     "phaser": "^3.18.1"
   }
 }
